@@ -322,7 +322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShinA.UI.MainMenuController
   statusText: {fileID: 1151789141}
   firstSelectedButton: {fileID: 1319556949}
-  gameSceneName: SampleScene
+  gameSceneName: WaitingScene
 --- !u!4 &61760083
 Transform:
   m_ObjectHideFlags: 0

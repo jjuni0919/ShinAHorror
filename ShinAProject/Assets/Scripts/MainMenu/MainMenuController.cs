@@ -10,9 +10,10 @@ namespace ShinA.UI
     {
         [SerializeField] private Text statusText;
         [SerializeField] private Button firstSelectedButton;
-        [SerializeField] private string gameSceneName = "SampleScene";
+        [SerializeField] private string gameSceneName = "WaitingScene";
 
         private Coroutine statusRoutine;
+        private MainMenuSettingsPanel settingsPanel;
 
         public void Initialize(Text status, Button firstButton, string sceneName)
         {
@@ -24,6 +25,12 @@ namespace ShinA.UI
         private void Awake()
         {
             ApplyKoreanFont();
+
+            Canvas canvas = GetComponentInChildren<Canvas>(true);
+            if (canvas != null)
+            {
+                settingsPanel = MainMenuSettingsPanel.Create(canvas);
+            }
 
             if (statusText != null)
             {
@@ -57,7 +64,10 @@ namespace ShinA.UI
 
         public void OpenSettings()
         {
-            ShowStatus("설정 메뉴는 준비 중입니다.");
+            if (settingsPanel != null)
+            {
+                settingsPanel.Open();
+            }
         }
 
         public void QuitGame()

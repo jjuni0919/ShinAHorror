@@ -35,7 +35,7 @@ namespace ShinA.Editor
             Button firstButton = CreateMenu(canvas.transform, controller);
             CreateFooter(canvas.transform);
 
-            controller.Initialize(status, firstButton, "SampleScene");
+            controller.Initialize(status, firstButton, "WaitingScene");
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath) ?? "Assets/Scenes");
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -307,7 +307,7 @@ namespace ShinA.Editor
         private static void SetBuildScenes()
         {
             EditorBuildSettingsScene mainMenu = new EditorBuildSettingsScene(ScenePath, true);
-            EditorBuildSettingsScene game = new EditorBuildSettingsScene("Assets/Scenes/SampleScene.unity", true);
+            EditorBuildSettingsScene game = new EditorBuildSettingsScene("Assets/Scenes/WaitingScene.unity", true);
             EditorBuildSettings.scenes = new[] { mainMenu, game };
         }
     }
