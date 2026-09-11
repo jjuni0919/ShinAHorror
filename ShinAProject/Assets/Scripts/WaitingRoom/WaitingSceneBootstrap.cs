@@ -1,3 +1,4 @@
+using ShinA.Inventory;
 using ShinA.Player;
 using ShinA.UI;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace ShinA.WaitingRoom
     {
         [SerializeField] private Vector3 playerSpawnPosition = new(0f, 0.05f, -5f);
         [SerializeField] private PlayerSkinDefinition initialPlayerSkin;
+        [SerializeField, Min(1)] private int inventorySlotCount = 6;
+        [SerializeField, Range(0f, 0.4f)] private float cameraForwardOffset = 0.18f;
 
         private void Awake()
         {
@@ -19,6 +22,7 @@ namespace ShinA.WaitingRoom
 
             CreateTestRoom();
             CreatePlayer();
+            CreateSamplePickups();
         }
 
         private void CreatePlayer()
@@ -36,7 +40,7 @@ namespace ShinA.WaitingRoom
 
             Camera playerCamera = GetComponent<Camera>();
             transform.SetParent(player.transform, false);
-            transform.localPosition = new Vector3(0f, 1.65f, 0f);
+            transform.localPosition = new Vector3(0f, 1.65f, cameraForwardOffset);
             transform.localRotation = Quaternion.identity;
             playerCamera.nearClipPlane = 0.05f;
 
@@ -44,9 +48,35 @@ namespace ShinA.WaitingRoom
             firstPersonController.Initialize(playerCamera);
 
             PlayerAppearance appearance = player.AddComponent<PlayerAppearance>();
-            appearance.Initialize(playerCamera.transform, initialPlayerSkin);
+            appearance.Initialize(playerCamera.transform, firstPersonController, initialPlayerSkin, true);
 
-            PlayerHud.Create(firstPersonController);
+            PlayerInventory inventory = player.AddComponent<PlayerInventory>();
+            inventory.Initialize(playerCamera, appearance, inventorySlotCount);
+
+            PlayerItemInteractor interactor = player.AddComponent<PlayerItemInteractor>();
+            interactor.Initialize(playerCamera, inventory);
+
+            PlayerHud.Create(firstPersonController, inventory);
+        }
+
+        private static void CreateSamplePickups()
+        {
+            GameObject pickupRoot = new("Sample Item Pickups");
+            var samples = SampleItemCatalog.CreateSamples();
+
+            for (int i = 0; i < samples.Count; i++)
+            {
+                float angle = (360f / samples.Count) * i + Random.Range(-8f, 8f);
+                float radius = Random.Range(3f, 7.2f);
+                Vector3 position = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
+                position.y = 0.65f;
+
+                GameObject pickupObject = new();
+                pickupObject.transform.SetParent(pickupRoot.transform, false);
+                pickupObject.transform.position = position;
+                ItemPickup pickup = pickupObject.AddComponent<ItemPickup>();
+                pickup.Initialize(samples[i]);
+            }
         }
 
         private static void CreateTestRoom()

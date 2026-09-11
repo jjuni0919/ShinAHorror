@@ -44,6 +44,7 @@ namespace ShinA.Player
         public float StaminaNormalized => maxStamina > 0f ? currentStamina / maxStamina : 0f;
         public bool IsRunning { get; private set; }
         public bool IsCrouching { get; private set; }
+        public float MovementAmount { get; private set; }
 
         public void Initialize(Camera cameraToUse)
         {
@@ -109,6 +110,7 @@ namespace ShinA.Player
             UpdateCrouch();
 
             Vector2 input = ReadMovementInput();
+            MovementAmount = Mathf.Clamp01(input.magnitude);
             Vector3 planarDirection = transform.right * input.x + transform.forward * input.y;
             planarDirection = Vector3.ClampMagnitude(planarDirection, 1f);
 

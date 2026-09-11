@@ -12,7 +12,8 @@ namespace ShinA.Settings
         MoveRight,
         Run,
         Jump,
-        Crouch
+        Crouch,
+        Interact
     }
 
     public static class PlayerInputBindings
@@ -68,6 +69,7 @@ namespace ShinA.Settings
                 PlayerAction.Run => Key.LeftShift,
                 PlayerAction.Jump => Key.Space,
                 PlayerAction.Crouch => Key.LeftCtrl,
+                PlayerAction.Interact => Key.E,
                 _ => Key.None
             };
         }
