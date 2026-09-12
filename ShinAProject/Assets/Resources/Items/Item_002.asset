@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 804aa79571b7431c83433399e35f8948, type: 3}
+  m_Name: Item_002
+  m_EditorClassIdentifier: Assembly-CSharp::ShinA.Inventory.NoEffectItemDefinition
+  itemNumber: 2
+  itemName: "\uCC22\uC5B4\uC9C4 \uC0AC\uC9C4"
+  description: "\uB204\uAD70\uAC00\uC758 \uC5BC\uAD74\uC774 \uC9C0\uC6CC\uC9C4 \uC624\uB798\uB41C
+    \uC0AC\uC9C4\uC774\uB2E4."
+  icon: {fileID: 0}
+  iconColor: {r: 0.76, g: 0.72, b: 0.62, a: 1}
+  equippedPrefab: {fileID: 2530748690789875630, guid: b09133c104350394581dbf9ca183271d, type: 3}

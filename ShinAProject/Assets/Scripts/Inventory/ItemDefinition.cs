@@ -55,5 +55,11 @@ namespace ShinA.Inventory
             iconColor = color;
             name = $"Item_{number:000}_{displayName}";
         }
+
+        public void ConfigureAssets(Sprite itemIcon, GameObject itemEquippedPrefab)
+        {
+            icon = itemIcon;
+            equippedPrefab = itemEquippedPrefab;
+        }
     }
 }

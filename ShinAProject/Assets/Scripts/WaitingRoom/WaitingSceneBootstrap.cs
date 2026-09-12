@@ -21,61 +21,51 @@ namespace ShinA.WaitingRoom
             }
 
             CreateTestRoom();
-            CreatePlayer();
+            CreatePlayerFromPrefab();
             CreateSamplePickups();
+            Destroy(gameObject);
         }
 
-        private void CreatePlayer()
+        private void CreatePlayerFromPrefab()
         {
-            GameObject player = new("Player");
-            player.tag = "Player";
+            Camera sceneCamera = GetComponent<Camera>();
+            if (sceneCamera != null)
+            {
+                sceneCamera.enabled = false;
+            }
+
+            AudioListener sceneListener = GetComponent<AudioListener>();
+            if (sceneListener != null)
+            {
+                sceneListener.enabled = false;
+            }
+
+            GameObject playerPrefab = Resources.Load<GameObject>("Prefabs/Player/Player");
+            if (playerPrefab == null)
+            {
+                Debug.LogError("Player prefab was not found at Resources/Prefabs/Player/Player.", this);
+                return;
+            }
+
+            GameObject player = Instantiate(playerPrefab);
             player.transform.SetPositionAndRotation(playerSpawnPosition, Quaternion.identity);
-
-            CharacterController controller = player.AddComponent<CharacterController>();
-            controller.height = 1.8f;
-            controller.radius = 0.35f;
-            controller.center = new Vector3(0f, 0.9f, 0f);
-            controller.stepOffset = 0.3f;
-            controller.slopeLimit = 45f;
-
-            Camera playerCamera = GetComponent<Camera>();
-            transform.SetParent(player.transform, false);
-            transform.localPosition = new Vector3(0f, 1.65f, cameraForwardOffset);
-            transform.localRotation = Quaternion.identity;
-            playerCamera.nearClipPlane = 0.05f;
-
-            FirstPersonController firstPersonController = player.AddComponent<FirstPersonController>();
-            firstPersonController.Initialize(playerCamera);
-
-            PlayerAppearance appearance = player.AddComponent<PlayerAppearance>();
-            appearance.Initialize(playerCamera.transform, firstPersonController, initialPlayerSkin, true);
-
-            PlayerInventory inventory = player.AddComponent<PlayerInventory>();
-            inventory.Initialize(playerCamera, appearance, inventorySlotCount);
-
-            PlayerItemInteractor interactor = player.AddComponent<PlayerItemInteractor>();
-            interactor.Initialize(playerCamera, inventory);
-
-            PlayerHud.Create(firstPersonController, inventory);
+            player.GetComponent<PlayerRuntimeSetup>()?.Configure(initialPlayerSkin, inventorySlotCount, cameraForwardOffset);
         }
 
         private static void CreateSamplePickups()
         {
             GameObject pickupRoot = new("Sample Item Pickups");
-            var samples = SampleItemCatalog.CreateSamples();
+            ItemPickup[] pickupPrefabs = Resources.LoadAll<ItemPickup>("Prefabs/Items");
 
-            for (int i = 0; i < samples.Count; i++)
+            for (int i = 0; i < pickupPrefabs.Length; i++)
             {
-                float angle = (360f / samples.Count) * i + Random.Range(-8f, 8f);
+                float angle = (360f / pickupPrefabs.Length) * i + Random.Range(-8f, 8f);
                 float radius = Random.Range(3f, 7.2f);
                 Vector3 position = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
                 position.y = 0.65f;
 
-                GameObject pickupObject = new();
-                pickupObject.transform.SetParent(pickupRoot.transform, false);
-                pickupObject.transform.position = position;
-                ItemPickup pickup = pickupObject.AddComponent<ItemPickup>();
-                pickup.Initialize(samples[i]);
+                ItemPickup pickup = Instantiate(pickupPrefabs[i], position, Quaternion.identity, pickupRoot.transform);
+                pickup.name = pickupPrefabs[i].name;
             }
         }
 

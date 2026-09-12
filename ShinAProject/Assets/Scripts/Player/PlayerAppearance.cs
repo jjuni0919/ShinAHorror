@@ -92,7 +92,7 @@ namespace ShinA.Player
                 ? $"Third Person Body ({skin.SkinId})"
                 : "Third Person Body (Default)";
 
-            thirdPersonHand = CreateHandMount(activeThirdPersonModel.transform, "Third Person Hand Mount");
+            thirdPersonHand = CreateHandMount(activeThirdPersonModel.transform, transform, "Third Person Hand Mount");
 
             ConfigureThirdPersonVisibility();
 
@@ -109,7 +109,7 @@ namespace ShinA.Player
                 ? $"First Person Arms ({skin.SkinId})"
                 : "First Person Arms (Default)";
 
-            firstPersonHand = CreateHandMount(activeFirstPersonModel.transform, "First Person Hand Mount");
+            firstPersonHand = CreateHandMount(activeFirstPersonModel.transform, firstPersonRoot, "First Person Hand Mount");
             ConfigureArmAnimation(activeFirstPersonModel);
             RebuildEquippedItem();
         }
@@ -152,25 +152,15 @@ namespace ShinA.Player
             animator.Initialize(controller, leftArm, rightArm);
         }
 
-        private Transform CreateHandMount(Transform modelRoot, string mountName)
+        private Transform CreateHandMount(Transform modelRoot, Transform unscaledParent, string mountName)
         {
             Transform rightHand = FindDeepChild(modelRoot, "Right Hand") ?? FindDeepChild(modelRoot, "Right Arm") ?? modelRoot;
             GameObject mount = new(mountName);
-            mount.transform.SetParent(rightHand, false);
-            mount.transform.localPosition = rightHand == modelRoot ? new Vector3(0.28f, -0.18f, 0.52f) : new Vector3(0f, 0.55f, 0f);
-            mount.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            if (rightHand != modelRoot)
-            {
-                Vector3 scale = rightHand.localScale;
-                mount.transform.localScale = new Vector3(
-                    SafeReciprocal(scale.x), SafeReciprocal(scale.y), SafeReciprocal(scale.z));
-            }
+            mount.transform.SetParent(unscaledParent, false);
+            Vector3 offset = rightHand == modelRoot ? new Vector3(0.28f, -0.18f, 0.52f) : new Vector3(0f, 0.55f, 0f);
+            HandMountFollower follower = mount.AddComponent<HandMountFollower>();
+            follower.Initialize(rightHand, offset, Quaternion.Euler(90f, 0f, 0f));
             return mount.transform;
-        }
-
-        private static float SafeReciprocal(float value)
-        {
-            return Mathf.Abs(value) > 0.0001f ? 1f / value : 1f;
         }
 
         private void RebuildEquippedItem()
@@ -202,6 +192,7 @@ namespace ShinA.Player
             if (equippedItem.EquippedPrefab != null)
             {
                 visual = Instantiate(equippedItem.EquippedPrefab, parent);
+                visual.transform.localScale = equippedItem.EquippedPrefab.transform.localScale;
             }
             else
             {
@@ -225,6 +216,10 @@ namespace ShinA.Player
             visual.name = $"Equipped - {equippedItem.ItemName}";
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localRotation = Quaternion.identity;
+            foreach (Collider itemCollider in visual.GetComponentsInChildren<Collider>(true))
+            {
+                itemCollider.enabled = false;
+            }
             return visual;
         }
 

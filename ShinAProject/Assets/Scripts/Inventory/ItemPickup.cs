@@ -14,6 +14,11 @@ namespace ShinA.Inventory
 
         public ItemDefinition Item => item;
 
+        public void SetDefinition(ItemDefinition definition)
+        {
+            item = definition;
+        }
+
         public void Initialize(ItemDefinition definition)
         {
             item = definition;
