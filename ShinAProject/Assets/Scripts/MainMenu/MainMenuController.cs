@@ -1,7 +1,7 @@
 using System.Collections;
+using ShinA.Managers;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace ShinA.UI
@@ -50,7 +50,7 @@ namespace ShinA.UI
         {
             if (Application.CanStreamedLevelBeLoaded(gameSceneName))
             {
-                SceneManager.LoadScene(gameSceneName);
+                SceneLoader.Instance.LoadScene(gameSceneName);
                 return;
             }
 
