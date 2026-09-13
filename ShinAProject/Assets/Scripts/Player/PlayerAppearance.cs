@@ -20,6 +20,7 @@ namespace ShinA.Player
         private Transform firstPersonHand;
         private Transform thirdPersonHand;
         private ItemDefinition equippedItem;
+        private FirstPersonAttackAnimator attackAnimator;
         private int originalCameraMask;
 
         public PlayerSkinDefinition CurrentSkin => currentSkin;
@@ -51,6 +52,11 @@ namespace ShinA.Player
         {
             equippedItem = item;
             RebuildEquippedItem();
+        }
+
+        public void PlayWeaponAttack(bool ranged)
+        {
+            attackAnimator?.Play(ranged);
         }
 
         // Multiplayer spawn code can call this after network ownership is known.
@@ -167,6 +173,7 @@ namespace ShinA.Player
         {
             DestroyModel(ref activeFirstPersonItem);
             DestroyModel(ref activeThirdPersonItem);
+            attackAnimator = null;
 
             if (equippedItem == null)
             {
@@ -183,6 +190,7 @@ namespace ShinA.Player
             if (isLocalPlayer && firstPersonHand != null)
             {
                 activeFirstPersonItem = CreateEquippedVisual(firstPersonHand, true);
+                attackAnimator = activeFirstPersonItem.AddComponent<FirstPersonAttackAnimator>();
             }
         }
 

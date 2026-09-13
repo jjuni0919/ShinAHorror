@@ -35,10 +35,13 @@ namespace ShinA.Player
             Camera playerCamera = GetComponentInChildren<Camera>(true);
             FirstPersonController controller = GetComponent<FirstPersonController>();
             PlayerAppearance appearance = GetComponent<PlayerAppearance>();
+            PlayerHealth health = GetComponent<PlayerHealth>();
             PlayerInventory inventory = GetComponent<PlayerInventory>();
             PlayerItemInteractor interactor = GetComponent<PlayerItemInteractor>();
+            PlayerTabletController tablet = GetComponent<PlayerTabletController>();
 
-            if (playerCamera == null || controller == null || appearance == null || inventory == null || interactor == null)
+            if (playerCamera == null || controller == null || appearance == null || health == null ||
+                inventory == null || interactor == null || tablet == null)
             {
                 Debug.LogError("Player prefab is missing one or more required components.", this);
                 return;
@@ -52,7 +55,8 @@ namespace ShinA.Player
             appearance.Initialize(playerCamera.transform, controller, initialSkin, true);
             inventory.Initialize(playerCamera, appearance, inventorySlotCount);
             interactor.Initialize(playerCamera, inventory);
-            PlayerHud.Create(controller, inventory);
+            tablet.Initialize(playerCamera, controller);
+            PlayerHud.Create(controller, health, inventory, interactor);
         }
     }
 }

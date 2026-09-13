@@ -17,6 +17,7 @@ namespace ShinA.Inventory
         public override bool Use(ItemUseContext context)
         {
             base.Use(context);
+            context.Inventory.PlayWeaponAttack(false);
             if (context.ViewCamera == null)
             {
                 return false;

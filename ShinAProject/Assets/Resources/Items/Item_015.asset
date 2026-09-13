@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1d98f563aeb4e4ba974c46f8aac057a, type: 3}
-  m_Name: Item_015
+  m_Name: "Item_015_\uC2E0\uD638\uD0C4 \uBC1C\uC0AC\uAE30"
   m_EditorClassIdentifier: Assembly-CSharp::ShinA.Inventory.RangedWeaponDefinition
   itemNumber: 15
   itemName: "\uC2E0\uD638\uD0C4 \uBC1C\uC0AC\uAE30"

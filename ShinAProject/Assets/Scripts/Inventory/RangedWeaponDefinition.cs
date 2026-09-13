@@ -15,6 +15,7 @@ namespace ShinA.Inventory
         public override bool Use(ItemUseContext context)
         {
             base.Use(context);
+            context.Inventory.PlayWeaponAttack(true);
             DamageFirstHit(context, attackRange, Damage);
             return true;
         }

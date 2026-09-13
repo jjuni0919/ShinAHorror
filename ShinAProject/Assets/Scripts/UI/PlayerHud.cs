@@ -17,19 +17,26 @@ namespace ShinA.UI
 
         private readonly List<SlotView> slotViews = new();
         private FirstPersonController player;
+        private PlayerHealth health;
         private PlayerInventory inventory;
+        private PlayerItemInteractor interactor;
         private RectTransform staminaFill;
+        private RectTransform healthFill;
         private RectTransform inventoryRoot;
         private Text responseText;
+        private Text pickupPrompt;
         private Font font;
         private float responseHideTime;
 
-        public static PlayerHud Create(FirstPersonController targetPlayer, PlayerInventory targetInventory)
+        public static PlayerHud Create(FirstPersonController targetPlayer, PlayerHealth targetHealth,
+            PlayerInventory targetInventory, PlayerItemInteractor targetInteractor)
         {
             GameObject root = new("Player HUD");
             PlayerHud hud = root.AddComponent<PlayerHud>();
             hud.player = targetPlayer;
+            hud.health = targetHealth;
             hud.inventory = targetInventory;
+            hud.interactor = targetInteractor;
             hud.BuildInterface();
             hud.Subscribe();
             hud.RefreshInventory();
@@ -52,6 +59,19 @@ namespace ShinA.UI
                 Vector2 anchorMax = staminaFill.anchorMax;
                 anchorMax.x = player.StaminaNormalized;
                 staminaFill.anchorMax = anchorMax;
+            }
+
+            if (health != null && healthFill != null)
+            {
+                Vector2 anchorMax = healthFill.anchorMax;
+                anchorMax.x = health.HealthNormalized;
+                healthFill.anchorMax = anchorMax;
+            }
+
+            if (pickupPrompt != null)
+            {
+                bool showPrompt = interactor != null && interactor.FocusedPickup != null;
+                pickupPrompt.gameObject.SetActive(showPrompt);
             }
 
             if (responseText != null && responseText.gameObject.activeSelf && Time.unscaledTime >= responseHideTime)
@@ -86,8 +106,17 @@ namespace ShinA.UI
             gameObject.AddComponent<GraphicRaycaster>();
 
             CreateCrosshair(transform);
+            CreateHealthBar(transform);
             CreateStaminaBar(transform);
             CreateInventory(transform);
+
+            pickupPrompt = CreateText("Pickup Prompt", transform, "획득하기 (E)", 22,
+                TextAnchor.MiddleCenter, Color.white, FontStyle.Bold);
+            RectTransform promptRect = pickupPrompt.rectTransform;
+            promptRect.anchorMin = promptRect.anchorMax = promptRect.pivot = new Vector2(0.5f, 0.5f);
+            promptRect.anchoredPosition = new Vector2(0f, -48f);
+            promptRect.sizeDelta = new Vector2(360f, 44f);
+            pickupPrompt.gameObject.SetActive(false);
 
             responseText = CreateText("Item Message", transform, string.Empty, 20, TextAnchor.MiddleCenter,
                 new Color(0.92f, 0.92f, 0.9f, 1f), FontStyle.Bold);
@@ -230,6 +259,34 @@ namespace ShinA.UI
             Image fill = CreateImage("Fill", fillArea.transform, new Color(0.68f, 0.055f, 0.055f, 0.96f));
             staminaFill = fill.rectTransform;
             Stretch(staminaFill);
+        }
+
+        private void CreateHealthBar(Transform parent)
+        {
+            GameObject group = new("Health", typeof(RectTransform));
+            group.transform.SetParent(parent, false);
+            RectTransform groupRect = group.GetComponent<RectTransform>();
+            groupRect.anchorMin = groupRect.anchorMax = groupRect.pivot = new Vector2(0f, 1f);
+            groupRect.anchoredPosition = new Vector2(64f, -70f);
+            groupRect.sizeDelta = new Vector2(320f, 42f);
+
+            Text label = CreateText("Label", group.transform, "HP", 18, TextAnchor.MiddleLeft,
+                new Color(0.92f, 0.92f, 0.9f), FontStyle.Bold);
+            label.rectTransform.anchorMin = Vector2.zero;
+            label.rectTransform.anchorMax = new Vector2(0f, 1f);
+            label.rectTransform.pivot = new Vector2(0f, 0.5f);
+            label.rectTransform.sizeDelta = new Vector2(42f, 0f);
+
+            Image background = CreateImage("Background", group.transform, new Color(0.015f, 0.018f, 0.021f, 0.88f));
+            RectTransform backgroundRect = background.rectTransform;
+            backgroundRect.anchorMin = new Vector2(0f, 0.18f);
+            backgroundRect.anchorMax = new Vector2(1f, 0.82f);
+            backgroundRect.offsetMin = new Vector2(48f, 0f);
+            backgroundRect.offsetMax = Vector2.zero;
+
+            Image fill = CreateImage("Fill", background.transform, new Color(0.62f, 0.05f, 0.06f, 1f));
+            healthFill = fill.rectTransform;
+            Stretch(healthFill);
         }
 
         private Text CreateText(string name, Transform parent, string value, int size,

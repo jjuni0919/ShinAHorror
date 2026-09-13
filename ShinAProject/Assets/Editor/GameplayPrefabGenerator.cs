@@ -40,7 +40,11 @@ namespace ShinA.Editor
 
             string[] itemAssets = AssetDatabase.FindAssets("t:ItemDefinition", new[] { ItemDataFolder });
             string[] pickupPrefabs = AssetDatabase.FindAssets("t:Prefab", new[] { ItemPickupFolder });
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath) == null ||
+            GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
+            bool playerNeedsUpdate = playerPrefab == null ||
+                                     playerPrefab.GetComponent<PlayerHealth>() == null ||
+                                     playerPrefab.GetComponent<PlayerTabletController>() == null;
+            if (playerNeedsUpdate ||
                 itemAssets.Length < 15 || pickupPrefabs.Length < 15)
             {
                 Generate();
@@ -69,9 +73,11 @@ namespace ShinA.Editor
             characterController.slopeLimit = 45f;
 
             player.AddComponent<FirstPersonController>();
+            player.AddComponent<PlayerHealth>();
             player.AddComponent<PlayerAppearance>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerItemInteractor>();
+            player.AddComponent<PlayerTabletController>();
             player.AddComponent<PlayerRuntimeSetup>();
 
             GameObject cameraObject = new("Player Camera");

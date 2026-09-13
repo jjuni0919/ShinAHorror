@@ -13,6 +13,7 @@ namespace ShinA.Inventory
         private readonly List<ItemDefinition> items = new();
         private Camera viewCamera;
         private PlayerAppearance appearance;
+        private FirstPersonController controller;
         private int selectedIndex;
         private float nextUseTime;
 
@@ -31,6 +32,7 @@ namespace ShinA.Inventory
         {
             viewCamera = playerCamera;
             appearance = playerAppearance;
+            controller = GetComponent<FirstPersonController>();
             capacity = Mathf.Max(1, slotCount);
             selectedIndex = 0;
         }
@@ -74,7 +76,7 @@ namespace ShinA.Inventory
         public bool UseSelected()
         {
             ItemDefinition item = SelectedItem;
-            if (item == null || Time.time < nextUseTime)
+            if (item == null || Time.time < nextUseTime || (controller != null && !controller.CanAct))
             {
                 return false;
             }
@@ -92,8 +94,18 @@ namespace ShinA.Inventory
             ItemResponse?.Invoke(message);
         }
 
+        public void PlayWeaponAttack(bool ranged)
+        {
+            appearance?.PlayWeaponAttack(ranged);
+        }
+
         private void Update()
         {
+            if (controller != null && !controller.CanAct)
+            {
+                return;
+            }
+
             HandleSlotSelection();
 
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame &&
