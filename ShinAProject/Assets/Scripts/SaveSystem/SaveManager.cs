@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using ShinA.Managers;
+using ShinA.Missions;
 using UnityEngine;
 
 namespace ShinA.SaveSystem
@@ -109,7 +111,7 @@ namespace ShinA.SaveSystem
             {
                 string json = File.ReadAllText(SaveFilePath);
                 data = JsonUtility.FromJson<SaveData>(json);
-                if (data == null || data.schemaVersion != SaveData.CurrentSchemaVersion)
+                if (data == null || !TryMigrate(data))
                 {
                     Debug.LogError("Save data is invalid or uses an unsupported schema version.", this);
                     data = null;
@@ -118,6 +120,8 @@ namespace ShinA.SaveSystem
 
                 data.player ??= new PlayerSaveData();
                 data.inventoryItemNumbers ??= new List<int>();
+                data.inventoryItemNumbers.Clear();
+                data.warehouseItemNumbers ??= new List<int>();
                 data.customData ??= new DictionaryData();
                 data.customData.keys ??= new List<string>();
                 data.customData.values ??= new List<string>();
@@ -137,10 +141,39 @@ namespace ShinA.SaveSystem
             return true;
         }
 
+        public bool LoadGame()
+        {
+            MissionSession session = MissionSession.Instance;
+            if (session.IsActive || !Load(out SaveData data))
+            {
+                return false;
+            }
+
+            session.RestoreProgress(data);
+            return SceneLoader.Instance.LoadScene("WaitingScene");
+        }
+
         public SaveData CreateNewData()
         {
             CurrentData = new SaveData();
             return CurrentData;
+        }
+
+        private static bool TryMigrate(SaveData data)
+        {
+            if (data.schemaVersion == 1)
+            {
+                data.schemaVersion = SaveData.CurrentSchemaVersion;
+                data.day = Mathf.Max(1, data.day);
+            }
+
+            if (data.schemaVersion != SaveData.CurrentSchemaVersion)
+            {
+                return false;
+            }
+
+            data.currentScene = "WaitingScene";
+            return true;
         }
     }
 }

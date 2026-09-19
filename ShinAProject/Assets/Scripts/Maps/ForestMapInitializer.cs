@@ -38,7 +38,8 @@ namespace ShinA.Maps
                 {
                     Vector3 position = new(x + Mathf.Lerp(-0.8f, 0.8f, (float)GenerationRandom.NextDouble()),
                         0f, z + Mathf.Lerp(-0.8f, 0.8f, (float)GenerationRandom.NextDouble()));
-                    if (position.sqrMagnitude < 36f || Mathf.Abs(position.x) < 2.8f)
+                    if ((Mathf.Abs(position.x) < 6f && Mathf.Abs(position.z) < 6f) ||
+                        Mathf.Abs(position.x) < 2.8f)
                     {
                         continue;
                     }
@@ -79,8 +80,9 @@ namespace ShinA.Maps
                 rock.GetComponent<Renderer>().sharedMaterial = moss;
             }
 
-            CreateBlock("Old Trail Marker", environment.transform, new Vector3(2f, 0.7f, 4f),
+            CreateBlock("Old Trail Marker", environment.transform, new Vector3(2f, 0.7f, 8f),
                 new Vector3(0.35f, 1.4f, 0.35f), moss);
+            CreateMissionBase(environment.transform, bark, earth, moss);
             for (int i = 0; i < 4; i++)
             {
                 GameObject bank = CreateBlock($"Outer Rock Bank {i + 1}", environment.transform,

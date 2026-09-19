@@ -37,6 +37,11 @@ namespace ShinA.Player
             PlayerHealth health = GetComponent<PlayerHealth>();
             PlayerInventory inventory = GetComponent<PlayerInventory>();
             PlayerItemInteractor interactor = GetComponent<PlayerItemInteractor>();
+            PlayerWorldInteractor worldInteractor = GetComponent<PlayerWorldInteractor>();
+            if (worldInteractor == null)
+            {
+                worldInteractor = gameObject.AddComponent<PlayerWorldInteractor>();
+            }
             PlayerTabletController tablet = GetComponent<PlayerTabletController>();
 
             if (playerCamera == null || controller == null || appearance == null || health == null ||
@@ -55,8 +60,9 @@ namespace ShinA.Player
             appearance.Initialize(playerCamera.transform, controller, initialSkin, true);
             inventory.Initialize(playerCamera, appearance, inventorySlotCount);
             interactor.Initialize(playerCamera, inventory);
+            worldInteractor.Initialize(playerCamera, controller);
             tablet.Initialize(playerCamera, controller);
-            PlayerHud.Create(controller, health, inventory, interactor);
+            PlayerHud.Create(controller, health, inventory, interactor, worldInteractor);
         }
     }
 }

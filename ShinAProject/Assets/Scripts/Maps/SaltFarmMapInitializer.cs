@@ -23,6 +23,11 @@ namespace ShinA.Maps
 
             for (int i = -3; i <= 3; i++)
             {
+                if (i == 0)
+                {
+                    continue;
+                }
+
                 CreateBlock($"Water Channel {i}", environment.transform, new Vector3(i * 5f, 0.01f, 2f),
                     new Vector3(3.2f, 0.08f, 32f), water);
             }
@@ -40,8 +45,9 @@ namespace ShinA.Maps
                 mound.GetComponent<Renderer>().sharedMaterial = salt;
             }
 
-            CreateBlock("Abandoned Walkway", environment.transform, new Vector3(0f, 0.22f, -5f),
-                new Vector3(2.2f, 0.35f, 22f), wood);
+            CreateBlock("Abandoned Walkway", environment.transform, new Vector3(0f, 0.22f, 10f),
+                new Vector3(2.2f, 0.35f, 10f), wood);
+            CreateMissionBase(environment.transform, wood, salt, water);
             CreateLighting();
             CreateTargets(environment.transform);
         }

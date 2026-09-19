@@ -7,15 +7,22 @@ namespace ShinA.SaveSystem
     [Serializable]
     public sealed class SaveData
     {
-        public const int CurrentSchemaVersion = 1;
+        public const int CurrentSchemaVersion = 2;
 
         public int schemaVersion = CurrentSchemaVersion;
         public string saveId = "main";
         public string savedAtUtc;
         public string currentScene;
         public float playTimeSeconds;
+        public int day = 1;
+        public int currency;
+        public int missionFailureCount;
+        public string lastMissionMapId;
+        public string lastMissionResult;
+        public int lastMissionSeed;
         public PlayerSaveData player = new();
         public List<int> inventoryItemNumbers = new();
+        public List<int> warehouseItemNumbers = new();
         public DictionaryData customData = new();
 
         public void MarkSavedNow()

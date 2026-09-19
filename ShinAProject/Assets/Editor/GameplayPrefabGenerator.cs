@@ -51,6 +51,7 @@ namespace ShinA.Editor
             player.AddComponent<PlayerAppearance>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerItemInteractor>();
+            player.AddComponent<PlayerWorldInteractor>();
             player.AddComponent<PlayerTabletController>();
             player.AddComponent<PlayerRuntimeSetup>();
 

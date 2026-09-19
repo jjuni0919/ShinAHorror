@@ -62,6 +62,7 @@ namespace ShinA.Maps
                 new Vector3(2f, 7f, 1.4f), stone);
             CreateBlock("Monolith Inlay", environment.transform, landmark + new Vector3(0f, 3.5f, -0.71f),
                 new Vector3(0.12f, 4f, 0.04f), paleStone);
+            CreateMissionBase(environment.transform, paleStone, sand, stone);
 
             for (int i = 0; i < 4; i++)
             {

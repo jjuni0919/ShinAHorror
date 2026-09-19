@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ShinA.Managers;
+using ShinA.Missions;
 using UnityEngine;
 
 namespace ShinA.Maps
@@ -11,6 +12,7 @@ namespace ShinA.Maps
         public string mapId;
         public string displayName;
         public string sceneName;
+        [Min(0f)] public float missionDurationSeconds;
         [TextArea] public string description;
     }
 
@@ -86,6 +88,13 @@ namespace ShinA.Maps
             return mapsById.TryGetValue(mapId, out map);
         }
 
+        public bool TryGetMapByScene(string sceneName, out MapRecord map)
+        {
+            map = maps.Find(record => string.Equals(record.sceneName, sceneName,
+                StringComparison.OrdinalIgnoreCase));
+            return map != null;
+        }
+
         public bool TravelToMap(string mapId)
         {
             return TravelToMap(mapId, null);
@@ -99,10 +108,27 @@ namespace ShinA.Maps
             }
 
             int? previousSeed = GenerationSeed;
-            GenerationSeed = seed ?? Guid.NewGuid().GetHashCode();
+            int resolvedSeed = seed ?? Guid.NewGuid().GetHashCode();
+            bool startsMission = map.missionDurationSeconds > 0f;
+            if (startsMission && !MissionSession.Instance.Prepare(map, resolvedSeed))
+            {
+                return false;
+            }
+
+            if (!startsMission && MissionSession.Instance.IsActive)
+            {
+                return false;
+            }
+
+            GenerationSeed = resolvedSeed;
             if (SceneLoader.Instance.LoadScene(map.sceneName))
             {
                 return true;
+            }
+
+            if (startsMission)
+            {
+                MissionSession.Instance.CancelPreparedMission();
             }
 
             GenerationSeed = previousSeed;
@@ -125,6 +151,7 @@ namespace ShinA.Maps
                 mapId = "salt_farm",
                 displayName = "흐린 염전",
                 sceneName = "SaltFarmScene",
+                missionDurationSeconds = 600f,
                 description = "안개와 잿빛 하늘로 뒤덮인 버려진 염전"
             });
             Register(new MapRecord
@@ -132,6 +159,7 @@ namespace ShinA.Maps
                 mapId = "desert",
                 displayName = "침묵의 사막",
                 sceneName = "DesertScene",
+                missionDurationSeconds = 720f,
                 description = "눈부신 모래 언덕 사이로 검은 석조 유적이 드러나는 사막"
             });
             Register(new MapRecord
@@ -139,6 +167,7 @@ namespace ShinA.Maps
                 mapId = "forest",
                 displayName = "안개의 수해",
                 sceneName = "ForestScene",
+                missionDurationSeconds = 900f,
                 description = "이끼 낀 바위와 빽빽한 나무, 차가운 안개로 둘러싸인 숲"
             });
         }

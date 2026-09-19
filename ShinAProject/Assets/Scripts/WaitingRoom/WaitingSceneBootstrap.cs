@@ -1,5 +1,6 @@
 using ShinA.Inventory;
 using ShinA.Maps;
+using ShinA.Missions;
 using ShinA.Player;
 using UnityEngine;
 
@@ -76,6 +77,16 @@ namespace ShinA.WaitingRoom
             CreateBlock("Test Platform", room.transform, new Vector3(3.5f, 0.5f, 3f), new Vector3(4f, 1f, 4f), floorMaterial);
             CreateBlock("Step 1", room.transform, new Vector3(-3f, 0.15f, 2f), new Vector3(2f, 0.3f, 1.5f), wallMaterial);
             CreateBlock("Step 2", room.transform, new Vector3(-3f, 0.45f, 3.2f), new Vector3(2f, 0.9f, 1.5f), wallMaterial);
+
+            CreateBlock("Warehouse Platform", room.transform, new Vector3(-5.8f, 0.05f, -4.8f),
+                new Vector3(5f, 0.2f, 5f), floorMaterial);
+            CreateBlock("Warehouse Back Wall", room.transform, new Vector3(-5.8f, 1.5f, -7.2f),
+                new Vector3(5f, 3f, 0.25f), wallMaterial);
+            CreateBlock("Warehouse Shelf Left", room.transform, new Vector3(-7.7f, 1f, -5.4f),
+                new Vector3(0.35f, 2f, 2.8f), wallMaterial);
+            GameObject warehouseTerminal = CreateBlock("Waiting Warehouse Terminal", room.transform,
+                new Vector3(-5.8f, 1f, -6.85f), new Vector3(1.4f, 1.7f, 0.55f), floorMaterial);
+            warehouseTerminal.AddComponent<WaitingWarehouseTerminal>();
         }
 
     }

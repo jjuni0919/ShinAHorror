@@ -22,6 +22,7 @@ namespace ShinA.UI
         private PlayerHealth health;
         private PlayerInventory inventory;
         private PlayerItemInteractor interactor;
+        private PlayerWorldInteractor worldInteractor;
         private RectTransform staminaFill;
         private RectTransform healthFill;
         private RectTransform inventoryRoot;
@@ -31,7 +32,8 @@ namespace ShinA.UI
         private float responseHideTime;
 
         public static PlayerHud Create(FirstPersonController targetPlayer, PlayerHealth targetHealth,
-            PlayerInventory targetInventory, PlayerItemInteractor targetInteractor)
+            PlayerInventory targetInventory, PlayerItemInteractor targetInteractor,
+            PlayerWorldInteractor targetWorldInteractor)
         {
             GameObject root = new("Player HUD");
             PlayerHud hud = root.AddComponent<PlayerHud>();
@@ -39,6 +41,7 @@ namespace ShinA.UI
             hud.health = targetHealth;
             hud.inventory = targetInventory;
             hud.interactor = targetInteractor;
+            hud.worldInteractor = targetWorldInteractor;
             hud.BuildInterface();
             hud.Subscribe();
             hud.RefreshHealth(targetHealth.CurrentHealth, targetHealth.MaxHealth);
@@ -71,8 +74,25 @@ namespace ShinA.UI
 
             if (pickupPrompt != null)
             {
-                bool showPrompt = interactor != null && interactor.FocusedPickup != null;
-                pickupPrompt.gameObject.SetActive(showPrompt);
+                if (worldInteractor != null && worldInteractor.FocusedInteractable != null)
+                {
+                    Key interactionKey = PlayerInputBindings.GetKey(PlayerAction.WorldInteract);
+                    pickupPrompt.text = interactionKey == Key.None
+                        ? worldInteractor.FocusedInteractable.InteractionPrompt
+                        : $"{worldInteractor.FocusedInteractable.InteractionPrompt} ({interactionKey})";
+                    pickupPrompt.gameObject.SetActive(true);
+                }
+                else
+                {
+                    bool showPrompt = interactor != null && interactor.FocusedPickup != null;
+                    if (showPrompt)
+                    {
+                        Key interactionKey = PlayerInputBindings.GetKey(PlayerAction.Interact);
+                        pickupPrompt.text = interactionKey == Key.None ? "획득하기" : $"획득하기 ({interactionKey})";
+                    }
+
+                    pickupPrompt.gameObject.SetActive(showPrompt);
+                }
             }
 
             if (responseText != null && responseText.gameObject.activeSelf && Time.unscaledTime >= responseHideTime)
@@ -111,9 +131,7 @@ namespace ShinA.UI
             CreateStaminaBar(transform);
             CreateInventory(transform);
 
-            Key interactKey = PlayerInputBindings.GetKey(PlayerAction.Interact);
-            string pickupText = interactKey == Key.None ? "획득하기" : $"획득하기 ({interactKey})";
-            pickupPrompt = CreateText("Pickup Prompt", transform, pickupText, 22,
+            pickupPrompt = CreateText("Interaction Prompt", transform, string.Empty, 22,
                 TextAnchor.MiddleCenter, Color.white, FontStyle.Bold);
             RectTransform promptRect = pickupPrompt.rectTransform;
             promptRect.anchorMin = promptRect.anchorMax = promptRect.pivot = new Vector2(0.5f, 0.5f);

@@ -63,6 +63,16 @@ namespace ShinA.Inventory
             return true;
         }
 
+        public List<ItemDefinition> TakeAllItems()
+        {
+            List<ItemDefinition> removedItems = new(items);
+            items.Clear();
+            selectedIndex = 0;
+            EquipSelected();
+            InventoryChanged?.Invoke();
+            return removedItems;
+        }
+
         public void SetCapacity(int slotCount)
         {
             capacity = Mathf.Max(items.Count, Mathf.Max(1, slotCount));
