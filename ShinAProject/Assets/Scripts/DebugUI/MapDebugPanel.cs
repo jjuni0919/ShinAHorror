@@ -7,6 +7,8 @@ namespace ShinA.DebugUI
     public sealed class MapDebugPanel : DebugPanelBase
     {
         private static MapDebugPanel instance;
+        private InputField seedInput;
+        private Text seedLabel;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreateOnStartup()
@@ -30,6 +32,7 @@ namespace ShinA.DebugUI
 
         protected override void BuildContent(Transform contentRoot)
         {
+            ((RectTransform)contentRoot).sizeDelta = new Vector2(620f, 760f);
             Image background = contentRoot.gameObject.AddComponent<Image>();
             background.color = new Color(0.035f, 0.04f, 0.045f, 0.98f);
 
@@ -38,13 +41,32 @@ namespace ShinA.DebugUI
             layout.spacing = 14f;
             layout.childAlignment = TextAnchor.UpperCenter;
             layout.childControlWidth = true;
-            layout.childControlHeight = false;
+            layout.childControlHeight = true;
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
             Text title = CreateText(contentRoot, $"MAP DEBUG  //  SHIFT + CTRL + {ToggleKey}", 26,
                 FontStyle.Bold);
             title.gameObject.AddComponent<LayoutElement>().preferredHeight = 58f;
+
+            seedLabel = CreateText(contentRoot, "생성 시드 · 비우면 무작위", 20, FontStyle.Normal);
+            seedLabel.gameObject.AddComponent<LayoutElement>().preferredHeight = 30f;
+            GameObject inputObject = new("Generation Seed", typeof(RectTransform));
+            inputObject.transform.SetParent(contentRoot, false);
+            inputObject.AddComponent<LayoutElement>().preferredHeight = 44f;
+            Image inputBackground = inputObject.AddComponent<Image>();
+            inputBackground.color = new Color(0.12f, 0.14f, 0.15f, 1f);
+            seedInput = inputObject.AddComponent<InputField>();
+            seedInput.targetGraphic = inputBackground;
+            Text inputText = CreateText(inputObject.transform, string.Empty, 22, FontStyle.Normal);
+            inputText.rectTransform.anchorMin = Vector2.zero;
+            inputText.rectTransform.anchorMax = Vector2.one;
+            inputText.rectTransform.offsetMin = new Vector2(12f, 0f);
+            inputText.rectTransform.offsetMax = new Vector2(-12f, 0f);
+            seedInput.textComponent = inputText;
+            seedInput.contentType = InputField.ContentType.IntegerNumber;
+            seedInput.characterLimit = 11;
+            seedInput.text = "12345";
 
             foreach (MapRecord map in MapDatabase.Instance.Maps)
             {
@@ -59,8 +81,22 @@ namespace ShinA.DebugUI
 
         private void Travel(string mapId)
         {
-            if (MapDatabase.Instance.TravelToMap(mapId))
+            int? seed = null;
+            if (!string.IsNullOrWhiteSpace(seedInput.text))
             {
+                if (!int.TryParse(seedInput.text, out int parsedSeed))
+                {
+                    seedLabel.text = "시드는 -2147483648 ~ 2147483647 범위의 정수입니다.";
+                    return;
+                }
+
+                seed = parsedSeed;
+            }
+
+            if (MapDatabase.Instance.TravelToMap(mapId, seed))
+            {
+                seedInput.text = MapDatabase.Instance.GenerationSeed.ToString();
+                seedLabel.text = "생성 시드 · 비우면 무작위";
                 SetOpen(false);
                 return;
             }

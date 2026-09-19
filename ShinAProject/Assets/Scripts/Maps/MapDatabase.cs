@@ -38,6 +38,7 @@ namespace ShinA.Maps
         }
 
         public IReadOnlyList<MapRecord> Maps => maps;
+        public int? GenerationSeed { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void CreateOnStartup()
@@ -87,7 +88,25 @@ namespace ShinA.Maps
 
         public bool TravelToMap(string mapId)
         {
-            return TryGetMap(mapId, out MapRecord map) && SceneLoader.Instance.LoadScene(map.sceneName);
+            return TravelToMap(mapId, null);
+        }
+
+        public bool TravelToMap(string mapId, int? seed)
+        {
+            if (!TryGetMap(mapId, out MapRecord map) || SceneLoader.Instance.IsLoading)
+            {
+                return false;
+            }
+
+            int? previousSeed = GenerationSeed;
+            GenerationSeed = seed ?? Guid.NewGuid().GetHashCode();
+            if (SceneLoader.Instance.LoadScene(map.sceneName))
+            {
+                return true;
+            }
+
+            GenerationSeed = previousSeed;
+            return false;
         }
 
         private void RegisterBuiltInMaps()
@@ -107,6 +126,20 @@ namespace ShinA.Maps
                 displayName = "흐린 염전",
                 sceneName = "SaltFarmScene",
                 description = "안개와 잿빛 하늘로 뒤덮인 버려진 염전"
+            });
+            Register(new MapRecord
+            {
+                mapId = "desert",
+                displayName = "침묵의 사막",
+                sceneName = "DesertScene",
+                description = "눈부신 모래 언덕 사이로 검은 석조 유적이 드러나는 사막"
+            });
+            Register(new MapRecord
+            {
+                mapId = "forest",
+                displayName = "안개의 수해",
+                sceneName = "ForestScene",
+                description = "이끼 낀 바위와 빽빽한 나무, 차가운 안개로 둘러싸인 숲"
             });
         }
     }

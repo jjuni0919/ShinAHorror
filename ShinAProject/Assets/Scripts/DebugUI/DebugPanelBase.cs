@@ -111,7 +111,10 @@ namespace ShinA.DebugUI
             Canvas canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 200;
-            gameObject.AddComponent<CanvasScaler>();
+            CanvasScaler scaler = gameObject.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 1f;
             gameObject.AddComponent<GraphicRaycaster>();
 
             panelRoot = new GameObject("Debug Panel", typeof(RectTransform));

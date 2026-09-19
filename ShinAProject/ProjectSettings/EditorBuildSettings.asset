@@ -14,6 +14,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SaltFarmScene.unity
     guid: 32cc857b8724c514f9b7f0f3b55be087
+  - enabled: 1
+    path: Assets/Scenes/DesertScene.unity
+    guid: d3e98d216b1c4817a17f51c484c5a202
+  - enabled: 1
+    path: Assets/Scenes/ForestScene.unity
+    guid: f4e98d216b1c4817a17f51c484c5a202
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

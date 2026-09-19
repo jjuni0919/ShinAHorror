@@ -30,7 +30,8 @@ namespace ShinA.Maps
             for (int i = 0; i < 12; i++)
             {
                 float angle = i * 30f;
-                Vector3 position = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * Random.Range(8f, 17f);
+                float radius = Mathf.Lerp(8f, 17f, (float)GenerationRandom.NextDouble());
+                Vector3 position = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
                 GameObject mound = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 mound.name = $"Salt Mound {i + 1}";
                 mound.transform.SetParent(environment.transform, false);

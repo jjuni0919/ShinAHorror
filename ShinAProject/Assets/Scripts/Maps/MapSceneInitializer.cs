@@ -6,9 +6,15 @@ namespace ShinA.Maps
     {
         [SerializeField] private Vector3 playerSpawnPosition = new(0f, 0.05f, 0f);
         [SerializeField] private Vector3 playerSpawnEulerAngles;
+        [SerializeField] private int generationSeed = 12345;
+
+        public int GenerationSeed { get; private set; }
+        protected System.Random GenerationRandom { get; private set; }
 
         protected virtual void Awake()
         {
+            GenerationSeed = MapDatabase.Instance.GenerationSeed ?? generationSeed;
+            GenerationRandom = new System.Random(GenerationSeed);
             InitializeEnvironment();
             GameObject player = SpawnPlayer();
             if (player != null)
