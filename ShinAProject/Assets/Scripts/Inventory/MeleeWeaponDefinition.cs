@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ShinA.Inventory
@@ -10,13 +11,12 @@ namespace ShinA.Inventory
 
         public void ConfigureMelee(float range, float radius)
         {
-            attackRange = range;
-            hitRadius = radius;
+            attackRange = Mathf.Max(0.1f, range);
+            hitRadius = Mathf.Max(0.01f, radius);
         }
 
         public override bool Use(ItemUseContext context)
         {
-            base.Use(context);
             context.Inventory.PlayWeaponAttack(false);
             if (context.ViewCamera == null)
             {
@@ -26,6 +26,7 @@ namespace ShinA.Inventory
             Ray ray = new(context.ViewCamera.transform.position, context.ViewCamera.transform.forward);
             RaycastHit[] hits = Physics.SphereCastAll(ray, hitRadius, attackRange, ~0,
                 QueryTriggerInteraction.Ignore);
+            Array.Sort(hits, (left, right) => left.distance.CompareTo(right.distance));
 
             foreach (RaycastHit hit in hits)
             {
@@ -34,13 +35,7 @@ namespace ShinA.Inventory
                     continue;
                 }
 
-                IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
-                if (damageable == null)
-                {
-                    continue;
-                }
-
-                damageable.TakeDamage(Damage, context.User);
+                hit.collider.GetComponentInParent<IDamageable>()?.TakeDamage(Damage, context.User);
                 return true;
             }
 

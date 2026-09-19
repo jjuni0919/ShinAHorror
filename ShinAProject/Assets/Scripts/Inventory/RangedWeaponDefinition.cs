@@ -9,12 +9,11 @@ namespace ShinA.Inventory
 
         public void ConfigureRange(float range)
         {
-            attackRange = range;
+            attackRange = Mathf.Max(0.1f, range);
         }
 
         public override bool Use(ItemUseContext context)
         {
-            base.Use(context);
             context.Inventory.PlayWeaponAttack(true);
             DamageFirstHit(context, attackRange, Damage);
             return true;

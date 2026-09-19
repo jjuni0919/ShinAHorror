@@ -14,33 +14,47 @@ namespace ShinA.Settings
 
         public static float MasterVolume
         {
-            get => PlayerPrefs.GetFloat(MasterVolumeKey, DefaultMasterVolume);
+            get => GetNormalizedValue(MasterVolumeKey, DefaultMasterVolume);
             set
             {
-                float clamped = Mathf.Clamp01(value);
+                float clamped = Normalize(value, DefaultMasterVolume);
                 PlayerPrefs.SetFloat(MasterVolumeKey, clamped);
                 AudioListener.volume = clamped;
-                PlayerPrefs.Save();
             }
         }
 
         public static float MouseSensitivityNormalized
         {
-            get => PlayerPrefs.GetFloat(MouseSensitivityKey, DefaultMouseSensitivity);
+            get => GetNormalizedValue(MouseSensitivityKey, DefaultMouseSensitivity);
             set
             {
-                PlayerPrefs.SetFloat(MouseSensitivityKey, Mathf.Clamp01(value));
-                PlayerPrefs.Save();
+                float clamped = Normalize(value, DefaultMouseSensitivity);
+                PlayerPrefs.SetFloat(MouseSensitivityKey, clamped);
             }
         }
 
         public static float LookSensitivity => Mathf.Lerp(
             MinimumLookSensitivity, MaximumLookSensitivity, MouseSensitivityNormalized);
 
+        internal static void SaveChanges()
+        {
+            PlayerPrefs.Save();
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void ApplySavedSettings()
         {
             AudioListener.volume = MasterVolume;
+        }
+
+        private static float GetNormalizedValue(string key, float fallback)
+        {
+            return Normalize(PlayerPrefs.GetFloat(key, fallback), fallback);
+        }
+
+        private static float Normalize(float value, float fallback)
+        {
+            return float.IsNaN(value) || float.IsInfinity(value) ? fallback : Mathf.Clamp01(value);
         }
     }
 }

@@ -9,8 +9,7 @@ namespace ShinA.Inventory
 
         public override bool Use(ItemUseContext context)
         {
-            base.Use(context);
-            Debug.Log($"{ItemName} has no usable effect.", context.User);
+            context.Inventory.NotifyItemResponse($"{ItemName}은(는) 사용할 수 없습니다.");
             return false;
         }
     }

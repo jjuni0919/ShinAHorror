@@ -35,6 +35,7 @@ namespace ShinA.UI
 
         public void Close()
         {
+            GameSettings.SaveChanges();
             gameObject.SetActive(false);
         }
 

@@ -40,7 +40,9 @@ namespace ShinA.Inventory
     {
         public static IReadOnlyList<ItemDefinition> LoadResourceItems()
         {
-            return Resources.LoadAll<ItemDefinition>("Items");
+            ItemDefinition[] items = Resources.LoadAll<ItemDefinition>("Items");
+            Array.Sort(items, (left, right) => left.ItemNumber.CompareTo(right.ItemNumber));
+            return items;
         }
 
         public static IReadOnlyList<ItemDefinition> CreateFromJson(TextAsset jsonAsset)
@@ -57,8 +59,16 @@ namespace ShinA.Inventory
             }
 
             List<ItemDefinition> definitions = new(catalog.items.Count);
+            HashSet<int> itemNumbers = new();
             foreach (ItemRecord record in catalog.items)
             {
+                if (record == null || record.itemNumber <= 0 || string.IsNullOrWhiteSpace(record.itemName) ||
+                    !itemNumbers.Add(record.itemNumber))
+                {
+                    Debug.LogError("Item catalog contains a null, duplicate, or incomplete item record.");
+                    continue;
+                }
+
                 ItemDefinition definition = CreateDefinition(record);
                 if (definition != null)
                 {
@@ -91,6 +101,11 @@ namespace ShinA.Inventory
                 InteractiveItemDefinition interactive = ScriptableObject.CreateInstance<InteractiveItemDefinition>();
                 interactive.ConfigureResponse(record.responseMessage);
                 definition = interactive;
+            }
+            else if (record.effectType == ItemEffectType.Weapon)
+            {
+                Debug.LogError($"Item {record.itemNumber} has no valid weapon attack type.");
+                return null;
             }
             else
             {

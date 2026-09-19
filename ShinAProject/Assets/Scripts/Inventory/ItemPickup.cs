@@ -11,6 +11,8 @@ namespace ShinA.Inventory
 
         private Vector3 startPosition;
         private float bobOffset;
+        private bool collected;
+        private Material generatedMaterial;
 
         public ItemDefinition Item => item;
 
@@ -22,14 +24,26 @@ namespace ShinA.Inventory
         public void Initialize(ItemDefinition definition)
         {
             item = definition;
-            name = $"Pickup - {definition.ItemName}";
+            if (item == null)
+            {
+                return;
+            }
+
+            name = $"Pickup - {item.ItemName}";
             BuildVisual();
         }
 
         public bool TryCollect(PlayerInventory inventory)
         {
-            if (item == null || !inventory.TryAdd(item))
+            if (collected || inventory == null || item == null)
             {
+                return false;
+            }
+
+            collected = true;
+            if (!inventory.TryAdd(item))
+            {
+                collected = false;
                 return false;
             }
 
@@ -54,9 +68,20 @@ namespace ShinA.Inventory
 
         private void BuildVisual()
         {
-            SphereCollider pickupCollider = gameObject.AddComponent<SphereCollider>();
+            SphereCollider pickupCollider = GetComponent<SphereCollider>();
+            if (pickupCollider == null)
+            {
+                pickupCollider = gameObject.AddComponent<SphereCollider>();
+            }
+
             pickupCollider.radius = 0.55f;
             pickupCollider.isTrigger = true;
+
+            Transform existingVisual = transform.Find("Visual");
+            if (existingVisual != null)
+            {
+                Destroy(existingVisual.gameObject);
+            }
 
             PrimitiveType primitiveType = item.EffectType == ItemEffectType.Weapon
                 ? PrimitiveType.Capsule
@@ -69,8 +94,23 @@ namespace ShinA.Inventory
                 : Vector3.one * 0.36f;
 
             Destroy(visual.GetComponent<Collider>());
+            if (generatedMaterial != null)
+            {
+                Destroy(generatedMaterial);
+            }
+
             Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            visual.GetComponent<Renderer>().sharedMaterial = new Material(shader) { color = item.IconColor };
+            generatedMaterial = new Material(shader) { color = item.IconColor };
+            visual.GetComponent<Renderer>().sharedMaterial = generatedMaterial;
         }
+
+        private void OnDestroy()
+        {
+            if (generatedMaterial != null)
+            {
+                Destroy(generatedMaterial);
+            }
+        }
+
     }
 }

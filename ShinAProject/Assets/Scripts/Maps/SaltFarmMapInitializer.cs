@@ -58,13 +58,14 @@ namespace ShinA.Maps
 
         private static void CreateTargets(Transform parent)
         {
+            Material targetMaterial = CreateMaterial(new Color(0.25f, 0.08f, 0.07f));
             for (int i = 0; i < 3; i++)
             {
                 GameObject target = GameObject.CreatePrimitive(PrimitiveType.Capsule);
                 target.name = $"Damageable Target {i + 1}";
                 target.transform.SetParent(parent, false);
                 target.transform.localPosition = new Vector3(-4f + i * 4f, 1f, 8f);
-                target.GetComponent<Renderer>().sharedMaterial = CreateMaterial(new Color(0.25f, 0.08f, 0.07f));
+                target.GetComponent<Renderer>().sharedMaterial = targetMaterial;
                 target.AddComponent<DamageableTarget>();
             }
         }

@@ -14,6 +14,7 @@ namespace ShinA.Player
         {
             basePosition = transform.localPosition;
             baseRotation = transform.localRotation;
+            enabled = false;
         }
 
         public void Play(bool isRanged)
@@ -27,7 +28,7 @@ namespace ShinA.Player
         private void Update()
         {
             elapsed += Time.deltaTime;
-            float normalized = Mathf.Clamp01(elapsed / duration);
+            float normalized = duration > 0f ? Mathf.Clamp01(elapsed / duration) : 1f;
             float pulse = Mathf.Sin(normalized * Mathf.PI);
 
             if (ranged)
@@ -47,6 +48,12 @@ namespace ShinA.Player
                 transform.localRotation = baseRotation;
                 enabled = false;
             }
+        }
+
+        private void OnDisable()
+        {
+            transform.localPosition = basePosition;
+            transform.localRotation = baseRotation;
         }
     }
 }

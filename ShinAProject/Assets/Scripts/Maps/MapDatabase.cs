@@ -76,6 +76,12 @@ namespace ShinA.Maps
 
         public bool TryGetMap(string mapId, out MapRecord map)
         {
+            if (string.IsNullOrWhiteSpace(mapId))
+            {
+                map = null;
+                return false;
+            }
+
             return mapsById.TryGetValue(mapId, out map);
         }
 

@@ -1,4 +1,3 @@
-using ShinA.Player;
 using UnityEngine;
 
 namespace ShinA.Maps
@@ -11,10 +10,18 @@ namespace ShinA.Maps
         protected virtual void Awake()
         {
             InitializeEnvironment();
-            SpawnPlayer();
+            GameObject player = SpawnPlayer();
+            if (player != null)
+            {
+                ConfigurePlayer(player);
+            }
         }
 
         protected abstract void InitializeEnvironment();
+
+        protected virtual void ConfigurePlayer(GameObject player)
+        {
+        }
 
         protected GameObject SpawnPlayer()
         {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ShinA.Settings;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,6 +8,8 @@ namespace ShinA.Player
     [RequireComponent(typeof(CharacterController))]
     public sealed class FirstPersonController : MonoBehaviour
     {
+        private const float GroundedVerticalVelocity = -2f;
+
         [Header("References")]
         [SerializeField] private Camera playerCamera;
 
@@ -34,8 +37,13 @@ namespace ShinA.Player
         [SerializeField, Min(0f)] private float jumpStaminaCost = 1f;
         [SerializeField, Range(0f, 1f)] private float exhaustionRecoveryThreshold = 0.4f;
 
+        [Header("Low Health")]
+        [SerializeField, Range(0f, 1f)] private float lowHealthThreshold = 0.2f;
+        [SerializeField, Range(0f, 1f)] private float lowHealthSpeedMultiplier = 0.5f;
+
         private CharacterController characterController;
         private PlayerHealth playerHealth;
+        private readonly HashSet<object> gameplayInputBlockers = new();
         private float verticalVelocity;
         private float cameraPitch;
         private float currentStamina;
@@ -48,8 +56,8 @@ namespace ShinA.Player
         public bool IsRunning { get; private set; }
         public bool IsCrouching { get; private set; }
         public float MovementAmount { get; private set; }
-        public bool CanAct => !staminaDepleted && gameplayInputEnabled;
-        public bool GameplayInputEnabled => gameplayInputEnabled;
+        public bool CanAct => GameplayInputEnabled;
+        public bool GameplayInputEnabled => gameplayInputEnabled && gameplayInputBlockers.Count == 0;
 
         public void Initialize(Camera cameraToUse)
         {
@@ -59,9 +67,33 @@ namespace ShinA.Player
         public void SetGameplayInputEnabled(bool enabled)
         {
             gameplayInputEnabled = enabled;
+            ApplyGameplayInputState();
+        }
+
+        internal void SetGameplayInputBlocked(object owner, bool blocked)
+        {
+            if (owner == null)
+            {
+                return;
+            }
+
+            bool changed = blocked
+                ? gameplayInputBlockers.Add(owner)
+                : gameplayInputBlockers.Remove(owner);
+            if (changed)
+            {
+                ApplyGameplayInputState();
+            }
+        }
+
+        private void ApplyGameplayInputState()
+        {
             IsRunning = false;
             MovementAmount = 0f;
-            SetCursorLocked(enabled);
+            if (isActiveAndEnabled)
+            {
+                SetCursorLocked(GameplayInputEnabled);
+            }
         }
 
         private void Awake()
@@ -78,7 +110,7 @@ namespace ShinA.Player
 
         private void OnEnable()
         {
-            SetCursorLocked(true);
+            SetCursorLocked(GameplayInputEnabled);
         }
 
         private void OnDisable()
@@ -88,17 +120,14 @@ namespace ShinA.Player
 
         private void Update()
         {
-            if (!gameplayInputEnabled)
+            if (!GameplayInputEnabled)
             {
                 ApplyGravityOnly();
                 return;
             }
 
             HandleCursor();
-            if (!staminaDepleted)
-            {
-                HandleLook();
-            }
+            HandleLook();
             HandleMovement();
         }
 
@@ -130,18 +159,14 @@ namespace ShinA.Player
 
         private void HandleMovement()
         {
+            bool wasExhausted = staminaDepleted;
             if (staminaDepleted)
             {
                 UpdateStamina(false);
-                if (currentStamina < maxStamina * exhaustionRecoveryThreshold)
+                if (currentStamina >= maxStamina * exhaustionRecoveryThreshold)
                 {
-                    MovementAmount = 0f;
-                    IsRunning = false;
-                    ApplyGravityOnly();
-                    return;
+                    staminaDepleted = false;
                 }
-
-                staminaDepleted = false;
             }
 
             UpdateCrouch();
@@ -154,22 +179,26 @@ namespace ShinA.Player
             bool hasMovementInput = planarDirection.sqrMagnitude > 0.001f;
             bool runHeld = PlayerInputBindings.IsPressed(PlayerAction.Run);
 
-            bool lowHealth = playerHealth != null && playerHealth.HealthNormalized <= 0.2f;
-            IsRunning = hasMovementInput && runHeld && !IsCrouching && !lowHealth && currentStamina > 0f;
-            UpdateStamina(IsRunning);
+            bool lowHealth = playerHealth != null && playerHealth.HealthNormalized <= lowHealthThreshold;
+            IsRunning = hasMovementInput && runHeld && !IsCrouching && !lowHealth &&
+                        !staminaDepleted && currentStamina > 0f;
+            if (!wasExhausted)
+            {
+                UpdateStamina(IsRunning);
+            }
 
             float speed = IsCrouching ? crouchSpeed : IsRunning ? runSpeed : walkSpeed;
             if (lowHealth)
             {
-                speed *= 0.5f;
+                speed *= lowHealthSpeedMultiplier;
             }
             if (characterController.isGrounded && verticalVelocity < 0f)
             {
-                verticalVelocity = -2f;
+                verticalVelocity = GroundedVerticalVelocity;
             }
 
             if (characterController.isGrounded &&
-                PlayerInputBindings.WasPressedThisFrame(PlayerAction.Jump) && !IsCrouching)
+                PlayerInputBindings.WasPressedThisFrame(PlayerAction.Jump) && !IsCrouching && !staminaDepleted)
             {
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 ConsumeStamina(jumpStaminaCost);
@@ -185,7 +214,7 @@ namespace ShinA.Player
         {
             if (characterController.isGrounded && verticalVelocity < 0f)
             {
-                verticalVelocity = -2f;
+                verticalVelocity = GroundedVerticalVelocity;
             }
 
             verticalVelocity += gravity * Time.deltaTime;

@@ -31,7 +31,6 @@ namespace ShinA.Player
                 return;
             }
 
-            initialized = true;
             Camera playerCamera = GetComponentInChildren<Camera>(true);
             FirstPersonController controller = GetComponent<FirstPersonController>();
             PlayerAppearance appearance = GetComponent<PlayerAppearance>();
@@ -47,6 +46,7 @@ namespace ShinA.Player
                 return;
             }
 
+            initialized = true;
             Vector3 cameraPosition = playerCamera.transform.localPosition;
             cameraPosition.z = cameraForwardOffset;
             playerCamera.transform.localPosition = cameraPosition;

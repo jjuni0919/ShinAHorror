@@ -11,6 +11,7 @@ namespace ShinA.Player
         private FirstPersonController controller;
         private Transform tabletRoot;
         private GameObject screenObject;
+        private Material bodyMaterial;
         private Vector3 loweredPosition = new(0.48f, -0.65f, 0.75f);
         private Vector3 raisedPosition = new(0f, -0.12f, 0.62f);
 
@@ -42,7 +43,7 @@ namespace ShinA.Player
         public void SetOpen(bool open, bool immediate = false)
         {
             IsOpen = open;
-            controller?.SetGameplayInputEnabled(!open);
+            controller?.SetGameplayInputBlocked(this, open);
 
             if (screenObject != null)
             {
@@ -52,6 +53,19 @@ namespace ShinA.Player
             if (immediate && tabletRoot != null)
             {
                 tabletRoot.localPosition = open ? raisedPosition : loweredPosition;
+            }
+        }
+
+        private void OnDisable()
+        {
+            controller?.SetGameplayInputBlocked(this, false);
+        }
+
+        private void OnEnable()
+        {
+            if (IsOpen)
+            {
+                controller?.SetGameplayInputBlocked(this, true);
             }
         }
 
@@ -67,7 +81,8 @@ namespace ShinA.Player
             body.transform.SetParent(tabletRoot, false);
             body.transform.localScale = new Vector3(0.72f, 0.44f, 0.035f);
             Destroy(body.GetComponent<Collider>());
-            body.GetComponent<Renderer>().sharedMaterial = CreateMaterial(new Color(0.025f, 0.028f, 0.032f));
+            bodyMaterial = CreateMaterial(new Color(0.025f, 0.028f, 0.032f));
+            body.GetComponent<Renderer>().sharedMaterial = bodyMaterial;
 
             GameObject canvasObject = new("Tablet Screen", typeof(RectTransform));
             canvasObject.transform.SetParent(tabletRoot, false);
@@ -121,6 +136,14 @@ namespace ShinA.Player
         {
             Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
             return new Material(shader) { color = color };
+        }
+
+        private void OnDestroy()
+        {
+            if (bodyMaterial != null)
+            {
+                Destroy(bodyMaterial);
+            }
         }
     }
 }

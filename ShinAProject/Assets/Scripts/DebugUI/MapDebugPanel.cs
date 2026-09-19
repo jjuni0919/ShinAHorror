@@ -42,7 +42,8 @@ namespace ShinA.DebugUI
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
-            Text title = CreateText(contentRoot, "MAP DEBUG  //  SHIFT + CTRL + F1", 26, FontStyle.Bold);
+            Text title = CreateText(contentRoot, $"MAP DEBUG  //  SHIFT + CTRL + {ToggleKey}", 26,
+                FontStyle.Bold);
             title.gameObject.AddComponent<LayoutElement>().preferredHeight = 58f;
 
             foreach (MapRecord map in MapDatabase.Instance.Maps)
@@ -61,7 +62,10 @@ namespace ShinA.DebugUI
             if (MapDatabase.Instance.TravelToMap(mapId))
             {
                 SetOpen(false);
+                return;
             }
+
+            Debug.LogWarning($"Failed to load map '{mapId}'.", this);
         }
 
         private Button CreateButton(Transform parent, string label)

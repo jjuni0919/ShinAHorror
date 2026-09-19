@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using ShinA.UI;
 using UnityEditor;
@@ -14,10 +15,16 @@ namespace ShinA.Editor
     public static class MainMenuSceneGenerator
     {
         private const string ScenePath = "Assets/Scenes/MainMenu.unity";
+        private const string WaitingScenePath = "Assets/Scenes/WaitingScene.unity";
 
         [MenuItem("ShinA/Generate Main Menu Scene")]
         public static void Generate()
         {
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                return;
+            }
+
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             scene.name = "MainMenu";
 
@@ -38,7 +45,12 @@ namespace ShinA.Editor
             controller.Initialize(status, firstButton, "WaitingScene");
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath) ?? "Assets/Scenes");
-            EditorSceneManager.SaveScene(scene, ScenePath);
+            if (!EditorSceneManager.SaveScene(scene, ScenePath))
+            {
+                Debug.LogError($"Failed to save main menu scene: {ScenePath}");
+                return;
+            }
+
             SetBuildScenes();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -307,8 +319,18 @@ namespace ShinA.Editor
         private static void SetBuildScenes()
         {
             EditorBuildSettingsScene mainMenu = new EditorBuildSettingsScene(ScenePath, true);
-            EditorBuildSettingsScene game = new EditorBuildSettingsScene("Assets/Scenes/WaitingScene.unity", true);
-            EditorBuildSettings.scenes = new[] { mainMenu, game };
+            EditorBuildSettingsScene waitingScene = new EditorBuildSettingsScene(WaitingScenePath, true);
+            List<EditorBuildSettingsScene> scenes = new() { mainMenu, waitingScene };
+
+            foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
+            {
+                if (scene.path != ScenePath && scene.path != WaitingScenePath)
+                {
+                    scenes.Add(scene);
+                }
+            }
+
+            EditorBuildSettings.scenes = scenes.ToArray();
         }
     }
 }

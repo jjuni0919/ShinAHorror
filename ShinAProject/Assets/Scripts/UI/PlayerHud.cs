@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using ShinA.Inventory;
 using ShinA.Player;
+using ShinA.Settings;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace ShinA.UI
@@ -39,6 +41,7 @@ namespace ShinA.UI
             hud.interactor = targetInteractor;
             hud.BuildInterface();
             hud.Subscribe();
+            hud.RefreshHealth(targetHealth.CurrentHealth, targetHealth.MaxHealth);
             hud.RefreshInventory();
             return hud;
         }
@@ -50,6 +53,11 @@ namespace ShinA.UI
                 inventory.InventoryChanged -= RefreshInventory;
                 inventory.ItemResponse -= ShowResponse;
             }
+
+            if (health != null)
+            {
+                health.HealthChanged -= RefreshHealth;
+            }
         }
 
         private void Update()
@@ -59,13 +67,6 @@ namespace ShinA.UI
                 Vector2 anchorMax = staminaFill.anchorMax;
                 anchorMax.x = player.StaminaNormalized;
                 staminaFill.anchorMax = anchorMax;
-            }
-
-            if (health != null && healthFill != null)
-            {
-                Vector2 anchorMax = healthFill.anchorMax;
-                anchorMax.x = health.HealthNormalized;
-                healthFill.anchorMax = anchorMax;
             }
 
             if (pickupPrompt != null)
@@ -84,6 +85,7 @@ namespace ShinA.UI
         {
             inventory.InventoryChanged += RefreshInventory;
             inventory.ItemResponse += ShowResponse;
+            health.HealthChanged += RefreshHealth;
         }
 
         private void BuildInterface()
@@ -103,14 +105,15 @@ namespace ShinA.UI
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
-            gameObject.AddComponent<GraphicRaycaster>();
 
             CreateCrosshair(transform);
             CreateHealthBar(transform);
             CreateStaminaBar(transform);
             CreateInventory(transform);
 
-            pickupPrompt = CreateText("Pickup Prompt", transform, "획득하기 (E)", 22,
+            Key interactKey = PlayerInputBindings.GetKey(PlayerAction.Interact);
+            string pickupText = interactKey == Key.None ? "획득하기" : $"획득하기 ({interactKey})";
+            pickupPrompt = CreateText("Pickup Prompt", transform, pickupText, 22,
                 TextAnchor.MiddleCenter, Color.white, FontStyle.Bold);
             RectTransform promptRect = pickupPrompt.rectTransform;
             promptRect.anchorMin = promptRect.anchorMax = promptRect.pivot = new Vector2(0.5f, 0.5f);
@@ -235,6 +238,18 @@ namespace ShinA.UI
             responseText.text = message;
             responseText.gameObject.SetActive(true);
             responseHideTime = Time.unscaledTime + 2.2f;
+        }
+
+        private void RefreshHealth(float currentHealth, float maxHealth)
+        {
+            if (healthFill == null)
+            {
+                return;
+            }
+
+            Vector2 anchorMax = healthFill.anchorMax;
+            anchorMax.x = maxHealth > 0f ? Mathf.Clamp01(currentHealth / maxHealth) : 0f;
+            healthFill.anchorMax = anchorMax;
         }
 
         private void CreateStaminaBar(Transform parent)

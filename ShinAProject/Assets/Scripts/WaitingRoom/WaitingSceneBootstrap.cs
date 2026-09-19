@@ -1,33 +1,34 @@
 using ShinA.Inventory;
+using ShinA.Maps;
 using ShinA.Player;
-using ShinA.UI;
 using UnityEngine;
 
 namespace ShinA.WaitingRoom
 {
     [DefaultExecutionOrder(-1000)]
-    public sealed class WaitingSceneBootstrap : MonoBehaviour
+    public sealed class WaitingSceneBootstrap : MapSceneInitializer
     {
-        [SerializeField] private Vector3 playerSpawnPosition = new(0f, 0.05f, -5f);
         [SerializeField] private PlayerSkinDefinition initialPlayerSkin;
         [SerializeField, Min(1)] private int inventorySlotCount = 6;
         [SerializeField, Range(0f, 0.4f)] private float cameraForwardOffset = 0.18f;
 
-        private void Awake()
+        protected override void InitializeEnvironment()
         {
-            if (GameObject.FindWithTag("Player") != null)
+            CreateTestRoom();
+            CreateSamplePickups();
+        }
+
+        protected override void ConfigurePlayer(GameObject player)
+        {
+            PlayerRuntimeSetup setup = player.GetComponent<PlayerRuntimeSetup>();
+            if (setup == null)
             {
+                Debug.LogError("Player prefab is missing PlayerRuntimeSetup.", player);
                 return;
             }
 
-            CreateTestRoom();
-            CreatePlayerFromPrefab();
-            CreateSamplePickups();
-            Destroy(gameObject);
-        }
+            setup.Configure(initialPlayerSkin, inventorySlotCount, cameraForwardOffset);
 
-        private void CreatePlayerFromPrefab()
-        {
             Camera sceneCamera = GetComponent<Camera>();
             if (sceneCamera != null)
             {
@@ -40,16 +41,7 @@ namespace ShinA.WaitingRoom
                 sceneListener.enabled = false;
             }
 
-            GameObject playerPrefab = Resources.Load<GameObject>("Prefabs/Player/Player");
-            if (playerPrefab == null)
-            {
-                Debug.LogError("Player prefab was not found at Resources/Prefabs/Player/Player.", this);
-                return;
-            }
-
-            GameObject player = Instantiate(playerPrefab);
-            player.transform.SetPositionAndRotation(playerSpawnPosition, Quaternion.identity);
-            player.GetComponent<PlayerRuntimeSetup>()?.Configure(initialPlayerSkin, inventorySlotCount, cameraForwardOffset);
+            Destroy(gameObject);
         }
 
         private static void CreateSamplePickups()
@@ -86,22 +78,5 @@ namespace ShinA.WaitingRoom
             CreateBlock("Step 2", room.transform, new Vector3(-3f, 0.45f, 3.2f), new Vector3(2f, 0.9f, 1.5f), wallMaterial);
         }
 
-        private static void CreateBlock(string name, Transform parent, Vector3 position, Vector3 scale, Material material)
-        {
-            GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            block.name = name;
-            block.transform.SetParent(parent, false);
-            block.transform.localPosition = position;
-            block.transform.localScale = scale;
-            block.GetComponent<Renderer>().sharedMaterial = material;
-        }
-
-        private static Material CreateMaterial(Color color)
-        {
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
-            Material material = new(shader);
-            material.color = color;
-            return material;
-        }
     }
 }

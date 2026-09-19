@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Collections.Generic;
 using ShinA.Maps;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -11,12 +11,6 @@ namespace ShinA.Editor
     {
         private const string ScenePath = "Assets/Scenes/SaltFarmScene.unity";
 
-        [InitializeOnLoadMethod]
-        private static void ScheduleGeneration()
-        {
-            EditorApplication.delayCall += GenerateIfMissing;
-        }
-
         [MenuItem("ShinA/Generate Salt Farm Scene")]
         public static void Generate()
         {
@@ -27,11 +21,17 @@ namespace ShinA.Editor
             GameObject initializer = new("SaltFarmMapInitializer");
             initializer.AddComponent<SaltFarmMapInitializer>();
 
-            EditorSceneManager.SaveScene(saltFarmScene, ScenePath);
+            bool saved = EditorSceneManager.SaveScene(saltFarmScene, ScenePath);
             EditorSceneManager.CloseScene(saltFarmScene, true);
             if (previousScene.IsValid())
             {
                 SceneManager.SetActiveScene(previousScene);
+            }
+
+            if (!saved)
+            {
+                Debug.LogError($"Failed to save salt farm scene: {ScenePath}");
+                return;
             }
 
             RegisterBuildScene();
@@ -40,31 +40,24 @@ namespace ShinA.Editor
             Debug.Log("Salt farm map scene generated and registered.");
         }
 
-        private static void GenerateIfMissing()
+        private static void RegisterBuildScene()
         {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            List<EditorBuildSettingsScene> scenes = new(EditorBuildSettings.scenes);
+            int index = scenes.FindIndex(scene => scene.path == ScenePath);
+            if (index < 0)
+            {
+                scenes.Add(new EditorBuildSettingsScene(ScenePath, true));
+            }
+            else if (!scenes[index].enabled)
+            {
+                scenes[index] = new EditorBuildSettingsScene(ScenePath, true);
+            }
+            else
             {
                 return;
             }
 
-            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) == null)
-            {
-                Generate();
-            }
-            else
-            {
-                RegisterBuildScene();
-            }
-        }
-
-        private static void RegisterBuildScene()
-        {
-            var scenes = EditorBuildSettings.scenes.ToList();
-            if (scenes.All(scene => scene.path != ScenePath))
-            {
-                scenes.Add(new EditorBuildSettingsScene(ScenePath, true));
-                EditorBuildSettings.scenes = scenes.ToArray();
-            }
+            EditorBuildSettings.scenes = scenes.ToArray();
         }
     }
 }

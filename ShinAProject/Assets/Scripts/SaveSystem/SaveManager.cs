@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -59,11 +60,12 @@ namespace ShinA.SaveSystem
                 return false;
             }
 
+            data.schemaVersion = SaveData.CurrentSchemaVersion;
+            data.MarkSavedNow();
+            string temporaryPath = SaveFilePath + ".tmp";
+
             try
             {
-                data.schemaVersion = SaveData.CurrentSchemaVersion;
-                data.MarkSavedNow();
-
                 string directory = Path.GetDirectoryName(SaveFilePath);
                 if (!string.IsNullOrEmpty(directory))
                 {
@@ -71,20 +73,28 @@ namespace ShinA.SaveSystem
                 }
 
                 string json = JsonUtility.ToJson(data, true);
-                string temporaryPath = SaveFilePath + ".tmp";
                 File.WriteAllText(temporaryPath, json);
-                File.Copy(temporaryPath, SaveFilePath, true);
-                File.Delete(temporaryPath);
-
-                CurrentData = data;
-                Saved?.Invoke(data);
-                return true;
+                if (File.Exists(SaveFilePath))
+                {
+                    File.Replace(temporaryPath, SaveFilePath, null);
+                }
+                else
+                {
+                    File.Move(temporaryPath, SaveFilePath);
+                }
             }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is IOException ||
+                                               exception is UnauthorizedAccessException ||
+                                               exception is NotSupportedException ||
+                                               exception is ArgumentException)
             {
-                Debug.LogError($"Failed to save game data: {exception.Message}", this);
+                Debug.LogException(exception, this);
                 return false;
             }
+
+            CurrentData = data;
+            Saved?.Invoke(data);
+            return true;
         }
 
         public bool Load(out SaveData data)
@@ -99,23 +109,32 @@ namespace ShinA.SaveSystem
             {
                 string json = File.ReadAllText(SaveFilePath);
                 data = JsonUtility.FromJson<SaveData>(json);
-                if (data == null || data.schemaVersion > SaveData.CurrentSchemaVersion)
+                if (data == null || data.schemaVersion != SaveData.CurrentSchemaVersion)
                 {
-                    Debug.LogError("Save data is invalid or uses a newer schema version.", this);
+                    Debug.LogError("Save data is invalid or uses an unsupported schema version.", this);
                     data = null;
                     return false;
                 }
 
-                CurrentData = data;
-                Loaded?.Invoke(data);
-                return true;
+                data.player ??= new PlayerSaveData();
+                data.inventoryItemNumbers ??= new List<int>();
+                data.customData ??= new DictionaryData();
+                data.customData.keys ??= new List<string>();
+                data.customData.values ??= new List<string>();
             }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is IOException ||
+                                               exception is UnauthorizedAccessException ||
+                                               exception is NotSupportedException ||
+                                               exception is ArgumentException)
             {
-                Debug.LogError($"Failed to load game data: {exception.Message}", this);
+                Debug.LogException(exception, this);
                 data = null;
                 return false;
             }
+
+            CurrentData = data;
+            Loaded?.Invoke(data);
+            return true;
         }
 
         public SaveData CreateNewData()

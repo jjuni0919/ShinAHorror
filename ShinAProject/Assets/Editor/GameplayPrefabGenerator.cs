@@ -14,12 +14,6 @@ namespace ShinA.Editor
         private const string ItemPickupFolder = "Assets/Resources/Prefabs/Items";
         private const string ItemMaterialFolder = "Assets/Resources/Materials/Items";
 
-        [InitializeOnLoadMethod]
-        private static void ScheduleInitialGeneration()
-        {
-            EditorApplication.delayCall += GenerateIfMissing;
-        }
-
         [MenuItem("ShinA/Generate Gameplay Prefabs")]
         public static void Generate()
         {
@@ -29,26 +23,6 @@ namespace ShinA.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("Player prefab and 15 item prefabs generated.");
-        }
-
-        private static void GenerateIfMissing()
-        {
-            if (EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                return;
-            }
-
-            string[] itemAssets = AssetDatabase.FindAssets("t:ItemDefinition", new[] { ItemDataFolder });
-            string[] pickupPrefabs = AssetDatabase.FindAssets("t:Prefab", new[] { ItemPickupFolder });
-            GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
-            bool playerNeedsUpdate = playerPrefab == null ||
-                                     playerPrefab.GetComponent<PlayerHealth>() == null ||
-                                     playerPrefab.GetComponent<PlayerTabletController>() == null;
-            if (playerNeedsUpdate ||
-                itemAssets.Length < 15 || pickupPrefabs.Length < 15)
-            {
-                Generate();
-            }
         }
 
         private static void CreateDirectories()
@@ -100,6 +74,7 @@ namespace ShinA.Editor
                 string number = sample.ItemNumber.ToString("000");
                 string itemAssetPath = $"{ItemDataFolder}/Item_{number}.asset";
                 ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(itemAssetPath);
+                Sprite existingIcon = definition != null ? definition.Icon : null;
                 if (definition == null || definition.GetType() != sample.GetType())
                 {
                     if (definition != null)
@@ -108,17 +83,17 @@ namespace ShinA.Editor
                     }
 
                     definition = Object.Instantiate(sample);
-                    definition.name = sample.name;
+                    definition.name = $"Item_{number}";
                     AssetDatabase.CreateAsset(definition, itemAssetPath);
                 }
                 else
                 {
                     EditorUtility.CopySerialized(sample, definition);
-                    definition.name = sample.name;
+                    definition.name = $"Item_{number}";
                 }
 
                 GameObject modelPrefab = CreateItemModelPrefab(definition, number);
-                definition.ConfigureAssets(definition.Icon, modelPrefab);
+                definition.ConfigureAssets(existingIcon, modelPrefab);
                 EditorUtility.SetDirty(definition);
                 CreatePickupPrefab(definition, modelPrefab, number);
                 Object.DestroyImmediate(sample);

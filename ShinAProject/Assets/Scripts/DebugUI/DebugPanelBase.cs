@@ -1,9 +1,9 @@
+using ShinA.Player;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using ShinA.Player;
 
 namespace ShinA.DebugUI
 {
@@ -14,10 +14,10 @@ namespace ShinA.DebugUI
         private CursorLockMode previousLockMode;
         private bool previousCursorVisible;
         private FirstPersonController controlledPlayer;
-        private bool previousGameplayInputEnabled;
 
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
         protected Font Font { get; private set; }
+        protected Key ToggleKey => toggleKey;
 
         protected virtual void Awake()
         {
@@ -29,7 +29,11 @@ namespace ShinA.DebugUI
         protected virtual void Update()
         {
             Keyboard keyboard = Keyboard.current;
-            if (keyboard == null) return;
+            if (keyboard == null || toggleKey == Key.None || !System.Enum.IsDefined(typeof(Key), toggleKey))
+            {
+                return;
+            }
+
             bool shift = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
             bool control = keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed;
             if (shift && control && keyboard[toggleKey].wasPressedThisFrame)
@@ -38,20 +42,27 @@ namespace ShinA.DebugUI
             }
         }
 
-        public void SetToggleKey(Key key) => toggleKey = key;
+        public void SetToggleKey(Key key)
+        {
+            toggleKey = System.Enum.IsDefined(typeof(Key), key) ? key : Key.None;
+        }
 
         public void SetOpen(bool open)
         {
-            if (panelRoot == null || panelRoot.activeSelf == open) return;
+            if (panelRoot == null || panelRoot.activeSelf == open)
+            {
+                return;
+            }
+
             if (open)
             {
+                EnsureEventSystem();
                 previousLockMode = Cursor.lockState;
                 previousCursorVisible = Cursor.visible;
                 controlledPlayer = FindFirstObjectByType<FirstPersonController>();
                 if (controlledPlayer != null)
                 {
-                    previousGameplayInputEnabled = controlledPlayer.GameplayInputEnabled;
-                    controlledPlayer.SetGameplayInputEnabled(false);
+                    controlledPlayer.SetGameplayInputBlocked(this, true);
                 }
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
@@ -60,13 +71,31 @@ namespace ShinA.DebugUI
             {
                 if (controlledPlayer != null)
                 {
-                    controlledPlayer.SetGameplayInputEnabled(previousGameplayInputEnabled);
+                    controlledPlayer.SetGameplayInputBlocked(this, false);
                     controlledPlayer = null;
                 }
+
                 Cursor.lockState = previousLockMode;
                 Cursor.visible = previousCursorVisible;
             }
+
             panelRoot.SetActive(open);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (controlledPlayer != null)
+            {
+                controlledPlayer.SetGameplayInputBlocked(this, false);
+            }
+        }
+
+        protected virtual void OnDisable()
+        {
+            if (IsOpen)
+            {
+                SetOpen(false);
+            }
         }
 
         protected abstract void BuildContent(Transform contentRoot);
@@ -74,7 +103,11 @@ namespace ShinA.DebugUI
         private void BuildPanel()
         {
             Font = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "맑은 고딕", "Arial" }, 24);
-            if (Font == null) Font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            if (Font == null)
+            {
+                Font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            }
+
             Canvas canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 200;
@@ -98,13 +131,20 @@ namespace ShinA.DebugUI
             contentRect.sizeDelta = new Vector2(620f, 520f);
             BuildContent(content.transform);
 
-            if (EventSystem.current == null)
+            EnsureEventSystem();
+        }
+
+        private static void EnsureEventSystem()
+        {
+            if (EventSystem.current != null)
             {
-                GameObject eventSystem = new("EventSystem");
-                DontDestroyOnLoad(eventSystem);
-                eventSystem.AddComponent<EventSystem>();
-                eventSystem.AddComponent<InputSystemUIInputModule>();
+                return;
             }
+
+            GameObject eventSystem = new("EventSystem");
+            DontDestroyOnLoad(eventSystem);
+            eventSystem.AddComponent<EventSystem>();
+            eventSystem.AddComponent<InputSystemUIInputModule>();
         }
     }
 }

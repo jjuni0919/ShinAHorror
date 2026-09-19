@@ -16,10 +16,10 @@ namespace ShinA.Inventory
 
         public override bool Use(ItemUseContext context)
         {
-            base.Use(context);
-            Debug.Log(string.IsNullOrWhiteSpace(responseMessage) ? $"{ItemName} reacts." : responseMessage,
-                context.User);
-            context.Inventory.NotifyItemResponse(responseMessage);
+            string message = string.IsNullOrWhiteSpace(responseMessage)
+                ? $"{ItemName}이(가) 반응한다."
+                : responseMessage;
+            context.Inventory.NotifyItemResponse(message);
             return true;
         }
     }

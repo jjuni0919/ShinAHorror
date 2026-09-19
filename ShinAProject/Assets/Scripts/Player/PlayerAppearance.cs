@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ShinA.Inventory;
 using UnityEngine;
 
@@ -17,6 +18,9 @@ namespace ShinA.Player
         private GameObject activeThirdPersonModel;
         private GameObject activeFirstPersonItem;
         private GameObject activeThirdPersonItem;
+        private Material activeFirstPersonItemMaterial;
+        private Material activeThirdPersonItemMaterial;
+        private readonly List<Material> appearanceMaterials = new();
         private Transform firstPersonHand;
         private Transform thirdPersonHand;
         private ItemDefinition equippedItem;
@@ -59,7 +63,6 @@ namespace ShinA.Player
             attackAnimator?.Play(ranged);
         }
 
-        // Multiplayer spawn code can call this after network ownership is known.
         public void SetLocalPlayer(bool localPlayer, Transform cameraTransform = null,
             FirstPersonController playerController = null)
         {
@@ -83,10 +86,16 @@ namespace ShinA.Player
         private void RebuildAppearance(PlayerSkinDefinition skin)
         {
             currentSkin = skin;
+            DestroyModel(ref activeFirstPersonItem);
+            DestroyModel(ref activeThirdPersonItem);
+            DestroyMaterial(ref activeFirstPersonItemMaterial);
+            DestroyMaterial(ref activeThirdPersonItemMaterial);
+            DestroyMount(ref firstPersonHand);
+            DestroyMount(ref thirdPersonHand);
             DestroyModel(ref activeFirstPersonModel);
             DestroyModel(ref activeThirdPersonModel);
-            firstPersonHand = null;
-            thirdPersonHand = null;
+            DestroyAppearanceMaterials();
+            attackAnimator = null;
 
             Color skinColor = skin != null ? skin.FallbackArmColor : new Color(0.64f, 0.48f, 0.38f);
             Color clothesColor = skin != null ? skin.FallbackClothesColor : new Color(0.12f, 0.16f, 0.2f);
@@ -115,6 +124,7 @@ namespace ShinA.Player
                 ? $"First Person Arms ({skin.SkinId})"
                 : "First Person Arms (Default)";
 
+            SetCollidersEnabled(activeFirstPersonModel, false);
             firstPersonHand = CreateHandMount(activeFirstPersonModel.transform, firstPersonRoot, "First Person Hand Mount");
             ConfigureArmAnimation(activeFirstPersonModel);
             RebuildEquippedItem();
@@ -147,8 +157,15 @@ namespace ShinA.Player
                 return;
             }
 
-            Transform leftArm = FindDeepChild(arms.transform, "Left Arm");
-            Transform rightArm = FindDeepChild(arms.transform, "Right Arm");
+            Animator humanoid = arms.GetComponentInChildren<Animator>();
+            Transform leftArm = humanoid != null && humanoid.isHuman
+                ? humanoid.GetBoneTransform(HumanBodyBones.LeftUpperArm)
+                : null;
+            Transform rightArm = humanoid != null && humanoid.isHuman
+                ? humanoid.GetBoneTransform(HumanBodyBones.RightUpperArm)
+                : null;
+            leftArm ??= FindDeepChild(arms.transform, "Left Arm");
+            rightArm ??= FindDeepChild(arms.transform, "Right Arm");
             FirstPersonArmAnimator animator = arms.GetComponent<FirstPersonArmAnimator>();
             if (animator == null)
             {
@@ -160,7 +177,11 @@ namespace ShinA.Player
 
         private Transform CreateHandMount(Transform modelRoot, Transform unscaledParent, string mountName)
         {
-            Transform rightHand = FindDeepChild(modelRoot, "Right Hand") ?? FindDeepChild(modelRoot, "Right Arm") ?? modelRoot;
+            Animator humanoid = modelRoot.GetComponentInChildren<Animator>();
+            Transform rightHand = humanoid != null && humanoid.isHuman
+                ? humanoid.GetBoneTransform(HumanBodyBones.RightHand)
+                : null;
+            rightHand ??= FindDeepChild(modelRoot, "Right Hand") ?? FindDeepChild(modelRoot, "Right Arm") ?? modelRoot;
             GameObject mount = new(mountName);
             mount.transform.SetParent(unscaledParent, false);
             Vector3 offset = rightHand == modelRoot ? new Vector3(0.28f, -0.18f, 0.52f) : new Vector3(0f, 0.55f, 0f);
@@ -173,6 +194,8 @@ namespace ShinA.Player
         {
             DestroyModel(ref activeFirstPersonItem);
             DestroyModel(ref activeThirdPersonItem);
+            DestroyMaterial(ref activeFirstPersonItemMaterial);
+            DestroyMaterial(ref activeThirdPersonItemMaterial);
             attackAnimator = null;
 
             if (equippedItem == null)
@@ -182,20 +205,30 @@ namespace ShinA.Player
 
             if (thirdPersonHand != null)
             {
-                activeThirdPersonItem = CreateEquippedVisual(thirdPersonHand, false);
+                activeThirdPersonItem = CreateEquippedVisual(thirdPersonHand, false,
+                    out activeThirdPersonItemMaterial);
                 int bodyLayer = activeThirdPersonModel != null ? activeThirdPersonModel.layer : 0;
                 SetLayerRecursively(activeThirdPersonItem, bodyLayer);
             }
 
             if (isLocalPlayer && firstPersonHand != null)
             {
-                activeFirstPersonItem = CreateEquippedVisual(firstPersonHand, true);
-                attackAnimator = activeFirstPersonItem.AddComponent<FirstPersonAttackAnimator>();
+                activeFirstPersonItem = CreateEquippedVisual(firstPersonHand, true,
+                    out activeFirstPersonItemMaterial);
+                if (equippedItem is WeaponItemDefinition)
+                {
+                    attackAnimator = activeFirstPersonItem.GetComponent<FirstPersonAttackAnimator>();
+                    if (attackAnimator == null)
+                    {
+                        attackAnimator = activeFirstPersonItem.AddComponent<FirstPersonAttackAnimator>();
+                    }
+                }
             }
         }
 
-        private GameObject CreateEquippedVisual(Transform parent, bool firstPerson)
+        private GameObject CreateEquippedVisual(Transform parent, bool firstPerson, out Material generatedMaterial)
         {
+            generatedMaterial = null;
             GameObject visual;
             if (equippedItem.EquippedPrefab != null)
             {
@@ -218,7 +251,8 @@ namespace ShinA.Player
                     Destroy(collider);
                 }
 
-                visual.GetComponent<Renderer>().sharedMaterial = CreateMaterial(equippedItem.IconColor);
+                generatedMaterial = CreateMaterial(equippedItem.IconColor);
+                visual.GetComponent<Renderer>().sharedMaterial = generatedMaterial;
             }
 
             visual.name = $"Equipped - {equippedItem.ItemName}";
@@ -235,7 +269,7 @@ namespace ShinA.Player
         {
             GameObject arms = new("First Person Arms");
             arms.transform.SetParent(firstPersonRoot, false);
-            Material skinMaterial = CreateMaterial(color);
+            Material skinMaterial = CreateAppearanceMaterial(color);
 
             CreatePart(PrimitiveType.Capsule, "Left Arm", arms.transform,
                 new Vector3(-0.29f, -0.32f, 0.48f), new Vector3(0.1f, 0.32f, 0.1f),
@@ -250,8 +284,8 @@ namespace ShinA.Player
         {
             GameObject body = new("Third Person Body");
             body.transform.SetParent(transform, false);
-            Material skinMaterial = CreateMaterial(skinColor);
-            Material clothesMaterial = CreateMaterial(clothesColor);
+            Material skinMaterial = CreateAppearanceMaterial(skinColor);
+            Material clothesMaterial = CreateAppearanceMaterial(clothesColor);
 
             CreatePart(PrimitiveType.Sphere, "Head", body.transform,
                 new Vector3(0f, 1.62f, 0f), new Vector3(0.34f, 0.38f, 0.34f), Quaternion.identity, skinMaterial);
@@ -288,6 +322,13 @@ namespace ShinA.Player
             return new Material(shader) { color = color };
         }
 
+        private Material CreateAppearanceMaterial(Color color)
+        {
+            Material material = CreateMaterial(color);
+            appearanceMaterials.Add(material);
+            return material;
+        }
+
         private static Transform FindDeepChild(Transform parent, string childName)
         {
             foreach (Transform child in parent)
@@ -316,6 +357,14 @@ namespace ShinA.Player
             }
         }
 
+        private static void SetCollidersEnabled(GameObject target, bool enabled)
+        {
+            foreach (Collider collider in target.GetComponentsInChildren<Collider>(true))
+            {
+                collider.enabled = enabled;
+            }
+        }
+
         private static void DestroyModel(ref GameObject model)
         {
             if (model != null)
@@ -323,6 +372,44 @@ namespace ShinA.Player
                 Destroy(model);
                 model = null;
             }
+        }
+
+        private static void DestroyMount(ref Transform mount)
+        {
+            if (mount != null)
+            {
+                Destroy(mount.gameObject);
+                mount = null;
+            }
+        }
+
+        private static void DestroyMaterial(ref Material material)
+        {
+            if (material != null)
+            {
+                Destroy(material);
+                material = null;
+            }
+        }
+
+        private void DestroyAppearanceMaterials()
+        {
+            foreach (Material material in appearanceMaterials)
+            {
+                if (material != null)
+                {
+                    Destroy(material);
+                }
+            }
+
+            appearanceMaterials.Clear();
+        }
+
+        private void OnDestroy()
+        {
+            DestroyMaterial(ref activeFirstPersonItemMaterial);
+            DestroyMaterial(ref activeThirdPersonItemMaterial);
+            DestroyAppearanceMaterials();
         }
     }
 }

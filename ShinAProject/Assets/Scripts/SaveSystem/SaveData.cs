@@ -57,7 +57,7 @@ namespace ShinA.SaveSystem
         public static implicit operator Vector3(SerializableVector3 value) => value.ToVector3();
     }
 
-    // JsonUtility cannot serialize Dictionary directly, so extensible values use key/value lists.
+    // JsonUtility cannot serialize Dictionary directly, so extensible values use parallel lists.
     [Serializable]
     public sealed class DictionaryData
     {
@@ -66,9 +66,16 @@ namespace ShinA.SaveSystem
 
         public void Set(string key, string value)
         {
+            keys ??= new List<string>();
+            values ??= new List<string>();
             int index = keys.IndexOf(key);
             if (index >= 0)
             {
+                while (values.Count <= index)
+                {
+                    values.Add(null);
+                }
+
                 values[index] = value;
                 return;
             }
@@ -79,6 +86,12 @@ namespace ShinA.SaveSystem
 
         public bool TryGet(string key, out string value)
         {
+            if (keys == null || values == null)
+            {
+                value = null;
+                return false;
+            }
+
             int index = keys.IndexOf(key);
             if (index >= 0 && index < values.Count)
             {

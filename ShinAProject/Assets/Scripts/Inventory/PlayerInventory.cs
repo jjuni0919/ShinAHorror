@@ -8,6 +8,12 @@ namespace ShinA.Inventory
 {
     public sealed class PlayerInventory : MonoBehaviour
     {
+        private static readonly Key[] NumberKeys =
+        {
+            Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5,
+            Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9
+        };
+
         [SerializeField, Min(1)] private int capacity = 6;
 
         private readonly List<ItemDefinition> items = new();
@@ -16,6 +22,7 @@ namespace ShinA.Inventory
         private FirstPersonController controller;
         private int selectedIndex;
         private float nextUseTime;
+        private bool cursorWasLocked;
 
         public event Action InventoryChanged;
         public event Action<string> ItemResponse;
@@ -35,6 +42,7 @@ namespace ShinA.Inventory
             controller = GetComponent<FirstPersonController>();
             capacity = Mathf.Max(1, slotCount);
             selectedIndex = 0;
+            cursorWasLocked = Cursor.lockState == CursorLockMode.Locked;
         }
 
         public bool TryAdd(ItemDefinition item)
@@ -58,6 +66,13 @@ namespace ShinA.Inventory
         public void SetCapacity(int slotCount)
         {
             capacity = Mathf.Max(items.Count, Mathf.Max(1, slotCount));
+            int clampedIndex = Mathf.Clamp(selectedIndex, 0, capacity - 1);
+            if (selectedIndex != clampedIndex)
+            {
+                selectedIndex = clampedIndex;
+                EquipSelected();
+            }
+
             InventoryChanged?.Invoke();
         }
 
@@ -82,11 +97,15 @@ namespace ShinA.Inventory
             }
 
             ItemUseContext context = new(gameObject, viewCamera, this);
-            bool used = item.Use(context);
+            if (!item.Use(context))
+            {
+                return false;
+            }
+
             nextUseTime = item is WeaponItemDefinition weapon
                 ? Time.time + weapon.UseCooldown
                 : Time.time + 0.2f;
-            return used;
+            return true;
         }
 
         public void NotifyItemResponse(string message)
@@ -99,6 +118,11 @@ namespace ShinA.Inventory
             appearance?.PlayWeaponAttack(ranged);
         }
 
+        private void OnEnable()
+        {
+            cursorWasLocked = Cursor.lockState == CursorLockMode.Locked;
+        }
+
         private void Update()
         {
             if (controller != null && !controller.CanAct)
@@ -109,26 +133,25 @@ namespace ShinA.Inventory
             HandleSlotSelection();
 
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame &&
-                Cursor.lockState == CursorLockMode.Locked)
+                cursorWasLocked && Cursor.lockState == CursorLockMode.Locked)
             {
                 UseSelected();
             }
+        }
+
+        private void LateUpdate()
+        {
+            cursorWasLocked = Cursor.lockState == CursorLockMode.Locked;
         }
 
         private void HandleSlotSelection()
         {
             if (Keyboard.current != null)
             {
-                Key[] numberKeys =
-                {
-                    Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5,
-                    Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9
-                };
-
-                int keyCount = Mathf.Min(capacity, numberKeys.Length);
+                int keyCount = Mathf.Min(capacity, NumberKeys.Length);
                 for (int i = 0; i < keyCount; i++)
                 {
-                    if (Keyboard.current[numberKeys[i]].wasPressedThisFrame)
+                    if (Keyboard.current[NumberKeys[i]].wasPressedThisFrame)
                     {
                         SelectSlot(i);
                         break;

@@ -1,4 +1,3 @@
-using ShinA.Player;
 using UnityEngine;
 
 namespace ShinA.Inventory
@@ -43,17 +42,16 @@ namespace ShinA.Inventory
 
         public virtual bool Use(ItemUseContext context)
         {
-            Debug.Log($"Used item: {itemName} ({itemNumber})", context.User);
             return true;
         }
 
         public void ConfigureSample(int number, string displayName, string itemDescription, Color color)
         {
-            itemNumber = number;
-            itemName = displayName;
-            description = itemDescription;
+            itemNumber = Mathf.Max(1, number);
+            itemName = displayName ?? string.Empty;
+            description = itemDescription ?? string.Empty;
             iconColor = color;
-            name = $"Item_{number:000}_{displayName}";
+            name = $"Item_{itemNumber:000}_{itemName}";
         }
 
         public void ConfigureAssets(Sprite itemIcon, GameObject itemEquippedPrefab)

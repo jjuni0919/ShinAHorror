@@ -18,8 +18,8 @@ namespace ShinA.Inventory
 
         public void ConfigureWeapon(float weaponDamage, float cooldown)
         {
-            damage = weaponDamage;
-            useCooldown = cooldown;
+            damage = Mathf.Max(0f, weaponDamage);
+            useCooldown = Mathf.Max(0.01f, cooldown);
         }
 
         protected static bool DamageFirstHit(ItemUseContext context, float range, float damage)

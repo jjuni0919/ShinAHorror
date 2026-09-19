@@ -6,6 +6,8 @@ namespace ShinA.Inventory
 {
     public sealed class PlayerItemInteractor : MonoBehaviour
     {
+        private const float RayAdvanceDistance = 0.01f;
+
         [SerializeField, Min(0.5f)] private float pickupDistance = 3f;
 
         private Camera viewCamera;
@@ -47,9 +49,26 @@ namespace ShinA.Inventory
             }
 
             Ray ray = new(viewCamera.transform.position, viewCamera.transform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, pickupDistance, ~0, QueryTriggerInteraction.Collide))
+            float remainingDistance = pickupDistance;
+
+            while (remainingDistance > 0f &&
+                   Physics.Raycast(ray, out RaycastHit hit, remainingDistance, ~0, QueryTriggerInteraction.Collide))
             {
-                FocusedPickup = hit.collider.GetComponentInParent<ItemPickup>();
+                ItemPickup pickup = hit.collider.GetComponentInParent<ItemPickup>();
+                if (pickup != null)
+                {
+                    FocusedPickup = pickup;
+                    return;
+                }
+
+                if (!hit.collider.isTrigger)
+                {
+                    return;
+                }
+
+                float advance = hit.distance + RayAdvanceDistance;
+                remainingDistance -= advance;
+                ray.origin = ray.GetPoint(advance);
             }
         }
     }

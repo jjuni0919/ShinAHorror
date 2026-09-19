@@ -9,7 +9,12 @@ namespace ShinA.Maps
 
         public void TakeDamage(float damage, GameObject source)
         {
-            health -= Mathf.Max(0f, damage);
+            if (damage <= 0f || health <= 0f)
+            {
+                return;
+            }
+
+            health -= damage;
             transform.localScale *= 0.94f;
             if (health <= 0f)
             {
