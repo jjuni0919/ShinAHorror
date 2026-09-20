@@ -74,12 +74,14 @@ namespace ShinA.Managers
         {
             IsLoading = true;
             LoadProgress = 0f;
+            GameStateManager.Instance.SetState(GameState.Loading);
             LoadStarted?.Invoke(sceneName);
 
             AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             if (operation == null)
             {
                 IsLoading = false;
+                GameStateManager.Instance.SetState(GameState.Playing);
                 yield break;
             }
 

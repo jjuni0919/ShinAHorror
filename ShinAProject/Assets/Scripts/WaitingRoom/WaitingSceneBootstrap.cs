@@ -1,4 +1,3 @@
-using ShinA.Inventory;
 using ShinA.Maps;
 using ShinA.Missions;
 using ShinA.Player;
@@ -16,7 +15,6 @@ namespace ShinA.WaitingRoom
         protected override void InitializeEnvironment()
         {
             CreateTestRoom();
-            CreateSamplePickups();
         }
 
         protected override void ConfigurePlayer(GameObject player)
@@ -43,23 +41,6 @@ namespace ShinA.WaitingRoom
             }
 
             Destroy(gameObject);
-        }
-
-        private static void CreateSamplePickups()
-        {
-            GameObject pickupRoot = new("Sample Item Pickups");
-            ItemPickup[] pickupPrefabs = Resources.LoadAll<ItemPickup>("Prefabs/Items");
-
-            for (int i = 0; i < pickupPrefabs.Length; i++)
-            {
-                float angle = (360f / pickupPrefabs.Length) * i + Random.Range(-8f, 8f);
-                float radius = Random.Range(3f, 7.2f);
-                Vector3 position = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
-                position.y = 0.65f;
-
-                ItemPickup pickup = Instantiate(pickupPrefabs[i], position, Quaternion.identity, pickupRoot.transform);
-                pickup.name = pickupPrefabs[i].name;
-            }
         }
 
         private static void CreateTestRoom()

@@ -120,6 +120,11 @@ namespace ShinA.Player
 
         private void Update()
         {
+            if (Time.timeScale <= 0f)
+            {
+                return;
+            }
+
             if (!GameplayInputEnabled)
             {
                 ApplyGravityOnly();
@@ -133,11 +138,7 @@ namespace ShinA.Player
 
         private void HandleCursor()
         {
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                SetCursorLocked(false);
-            }
-            else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 SetCursorLocked(true);
             }

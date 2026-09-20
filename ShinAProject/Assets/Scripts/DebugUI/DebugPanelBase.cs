@@ -28,6 +28,11 @@ namespace ShinA.DebugUI
 
         protected virtual void Update()
         {
+            if (Time.timeScale == 0f)
+            {
+                return;
+            }
+
             Keyboard keyboard = Keyboard.current;
             if (keyboard == null || toggleKey == Key.None || !System.Enum.IsDefined(typeof(Key), toggleKey))
             {

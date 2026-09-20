@@ -88,13 +88,18 @@ namespace ShinA.Missions
 
         private void Update()
         {
-            accumulatedPlayTime += Time.unscaledDeltaTime;
+            if (Time.timeScale <= 0f)
+            {
+                return;
+            }
+
+            accumulatedPlayTime += Time.deltaTime;
             if (!running || ending)
             {
                 return;
             }
 
-            remainingTime -= Time.unscaledDeltaTime;
+            remainingTime -= Time.deltaTime;
             if (remainingTime <= 0f)
             {
                 EndMission(MissionOutcome.TimeExpired);

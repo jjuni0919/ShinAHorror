@@ -46,7 +46,7 @@ namespace ShinA.Monsters
 
         protected virtual void Update()
         {
-            if (isDead || definition == null)
+            if (isDead || definition == null || Time.timeScale <= 0f)
             {
                 return;
             }

@@ -2,7 +2,6 @@ using ShinA.Inventory;
 using ShinA.Player;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace ShinA.Missions
@@ -61,15 +60,6 @@ namespace ShinA.Missions
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             confirmationRoot.SetActive(true);
-        }
-
-        private void Update()
-        {
-            if (confirmationRoot != null && confirmationRoot.activeSelf &&
-                Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                CloseConfirmation();
-            }
         }
 
         private void CompleteMission()

@@ -80,6 +80,11 @@ namespace ShinA.Monsters
 
         protected virtual void Update()
         {
+            if (Time.timeScale <= 0f)
+            {
+                return;
+            }
+
             remainingTickTime -= Time.deltaTime;
             if (remainingTickTime > 0f)
             {

@@ -31,6 +31,11 @@ namespace ShinA.Player
 
         private void Update()
         {
+            if (Time.timeScale == 0f)
+            {
+                return;
+            }
+
             if (PlayerInputBindings.WasPressedThisFrame(PlayerAction.Tablet) &&
                 (IsOpen || controller == null || controller.CanAct))
             {
