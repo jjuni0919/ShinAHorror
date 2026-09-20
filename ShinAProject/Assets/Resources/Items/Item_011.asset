@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Item_011
   m_EditorClassIdentifier: Assembly-CSharp::ShinA.Inventory.MeleeWeaponDefinition
   itemNumber: 11
+  salePrice: 50
   itemName: "\uC1E0\uD30C\uC774\uD504"
   description: "\uB2E8\uC21C\uD558\uC9C0\uB9CC \uD2BC\uD2BC\uD55C \uADFC\uC811 \uBB34\uAE30\uB2E4."
   icon: {fileID: 0}

@@ -1,5 +1,6 @@
 using ShinA.Inventory;
 using ShinA.UI;
+using ShinA.SaveSystem;
 using UnityEngine;
 
 namespace ShinA.Player
@@ -59,6 +60,19 @@ namespace ShinA.Player
             controller.Initialize(playerCamera);
             appearance.Initialize(playerCamera.transform, controller, initialSkin, true);
             inventory.Initialize(playerCamera, appearance, inventorySlotCount);
+            SaveData data = SaveManager.Instance.CurrentData;
+            if (data != null)
+            {
+                foreach (int number in data.inventoryItemNumbers)
+                {
+                    ItemDefinition item = Resources.Load<ItemDefinition>($"Items/Item_{number:000}");
+                    if (item != null && !inventory.TryAdd(item))
+                    {
+                        ItemPickup.Spawn(item, transform.position + Vector3.up, Quaternion.identity);
+                    }
+                }
+                inventory.SelectSlot(Mathf.Clamp(data.player.selectedInventorySlot, 0, inventory.Capacity - 1));
+            }
             interactor.Initialize(playerCamera, inventory);
             worldInteractor.Initialize(playerCamera, controller);
             tablet.Initialize(playerCamera, controller);

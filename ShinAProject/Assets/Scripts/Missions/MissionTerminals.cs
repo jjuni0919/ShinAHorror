@@ -17,6 +17,8 @@ namespace ShinA.Missions
             inventory?.NotifyItemResponse(storedCount > 0
                 ? $"아이템 {storedCount}개를 현장 창고에 보관했습니다."
                 : "보관할 아이템이 없습니다.");
+            player.GetComponent<PlayerTabletController>()?.ShowStorage();
+            ShinA.SaveSystem.SaveManager.Instance.SaveCurrent();
         }
     }
 
@@ -29,6 +31,7 @@ namespace ShinA.Missions
             PlayerProgress progress = MissionSession.Instance.Progress;
             player.GetComponent<PlayerInventory>()?.NotifyItemResponse(
                 $"창고 {progress.WarehouseItemNumbers.Count}개  ·  보유 재화 {progress.Currency:N0}");
+            player.GetComponent<PlayerTabletController>()?.ShowStorage();
         }
     }
 
@@ -113,7 +116,7 @@ namespace ShinA.Missions
             }
 
             Text message = CreateText("Message", panelRect, font,
-                "임무를 완료하고 본부로 귀환하시겠습니까?\n현장 창고의 아이템만 대기실 창고로 이동합니다.", 25);
+                "임무를 완료하고 귀환하시겠습니까?\n현장 창고의 물품은 대기실 바닥으로 이송됩니다.", 25);
             message.rectTransform.anchorMin = new Vector2(0.08f, 0.38f);
             message.rectTransform.anchorMax = new Vector2(0.92f, 0.9f);
             StretchOffsets(message.rectTransform);

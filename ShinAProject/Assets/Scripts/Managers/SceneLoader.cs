@@ -72,6 +72,7 @@ namespace ShinA.Managers
 
         private IEnumerator LoadSceneRoutine(string sceneName)
         {
+            ShinA.SaveSystem.SaveManager.Instance.SaveForSceneChange(sceneName);
             IsLoading = true;
             LoadProgress = 0f;
             GameStateManager.Instance.SetState(GameState.Loading);

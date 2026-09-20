@@ -48,6 +48,9 @@ namespace ShinA.WaitingRoom
             GameObject room = new("Test Room");
             Material floorMaterial = CreateMaterial(new Color(0.18f, 0.19f, 0.21f));
             Material wallMaterial = CreateMaterial(new Color(0.32f, 0.34f, 0.37f));
+            GameObject departure = CreateBlock("출발 단말기", room.transform, new Vector3(0f, 0.6f, 1.8f),
+                new Vector3(0.8f, 1.2f, 0.6f), wallMaterial);
+            departure.AddComponent<DepartureTerminal>();
 
             CreateBlock("Floor", room.transform, new Vector3(0f, -0.25f, 0f), new Vector3(18f, 0.5f, 18f), floorMaterial);
             CreateBlock("North Wall", room.transform, new Vector3(0f, 2f, 9f), new Vector3(18f, 4.5f, 0.4f), wallMaterial);

@@ -16,6 +16,9 @@ namespace ShinA.Maps
         protected virtual void Awake()
         {
             GenerationSeed = MapDatabase.Instance.GenerationSeed ?? generationSeed;
+            ShinA.SaveSystem.SaveData saved = ShinA.SaveSystem.SaveManager.Instance.CurrentData;
+            if (saved != null && saved.currentScene == gameObject.scene.name && !string.IsNullOrEmpty(saved.activeMissionMapId))
+                GenerationSeed = saved.activeMissionSeed;
             GenerationRandom = new System.Random(GenerationSeed);
             MapDatabase.Instance.TryGetMapByScene(SceneManager.GetActiveScene().name, out MapRecord currentMap);
             if (currentMap != null && currentMap.missionDurationSeconds > 0f)

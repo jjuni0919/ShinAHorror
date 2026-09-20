@@ -7,7 +7,8 @@ namespace ShinA.SaveSystem
     [Serializable]
     public sealed class SaveData
     {
-        public const int CurrentSchemaVersion = 2;
+        public const int CurrentSchemaVersion = 4;
+        public const int StartingCurrency = 500;
 
         public int schemaVersion = CurrentSchemaVersion;
         public string saveId = "main";
@@ -15,7 +16,10 @@ namespace ShinA.SaveSystem
         public string currentScene;
         public float playTimeSeconds;
         public int day = 1;
-        public int currency;
+        public int currency = StartingCurrency;
+        public List<int> collectionItemNumbers = new();
+        public bool gameOver;
+        public int lastSettlementRevenue;
         public int missionFailureCount;
         public string lastMissionMapId;
         public string lastMissionResult;
@@ -23,12 +27,40 @@ namespace ShinA.SaveSystem
         public PlayerSaveData player = new();
         public List<int> inventoryItemNumbers = new();
         public List<int> warehouseItemNumbers = new();
+        public List<WorldItemSceneData> worldItems = new();
+        public List<int> pendingOrders = new();
+        public List<int> deliveredOrders = new();
+        public bool deliveryBoxOpened;
+        public int successfulExpeditions;
+        public bool companyRewardClaimed;
+        public string selectedMapId;
+        public string activeMissionMapId;
+        public int activeMissionSeed;
+        public float missionRemainingTime;
+        public int missionCurrency;
+        public List<int> fieldStorageItems = new();
         public DictionaryData customData = new();
 
         public void MarkSavedNow()
         {
             savedAtUtc = DateTime.UtcNow.ToString("O");
         }
+    }
+
+    [Serializable]
+    public sealed class WorldItemSceneData
+    {
+        public string sceneName;
+        public int seed;
+        public List<WorldItemData> items = new();
+    }
+
+    [Serializable]
+    public sealed class WorldItemData
+    {
+        public int itemNumber;
+        public SerializableVector3 position;
+        public SerializableVector3 eulerAngles;
     }
 
     [Serializable]

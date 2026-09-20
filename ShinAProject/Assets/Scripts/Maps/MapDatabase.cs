@@ -108,8 +108,9 @@ namespace ShinA.Maps
             }
 
             int? previousSeed = GenerationSeed;
-            int resolvedSeed = seed ?? Guid.NewGuid().GetHashCode();
             bool startsMission = map.missionDurationSeconds > 0f;
+            if (mapId == "company" || MissionSession.Instance.Progress.IsGameOver) return false;
+            int resolvedSeed = startsMission ? seed ?? Guid.NewGuid().GetHashCode() : 0;
             if (startsMission && !MissionSession.Instance.Prepare(map, resolvedSeed))
             {
                 return false;
@@ -120,7 +121,7 @@ namespace ShinA.Maps
                 return false;
             }
 
-            GenerationSeed = resolvedSeed;
+            GenerationSeed = startsMission ? resolvedSeed : null;
             if (SceneLoader.Instance.LoadScene(map.sceneName))
             {
                 return true;
@@ -139,6 +140,13 @@ namespace ShinA.Maps
         {
             maps.Clear();
             mapsById.Clear();
+            Register(new MapRecord
+            {
+                mapId = "company",
+                displayName = "회사 본부",
+                sceneName = "CompanyScene",
+                description = "5일차 보상 정산과 물품 판매"
+            });
             Register(new MapRecord
             {
                 mapId = "waiting_room",

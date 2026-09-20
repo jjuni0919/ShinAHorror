@@ -31,6 +31,7 @@ namespace ShinA.Inventory
         [SerializeField] private Sprite icon;
         [SerializeField] private Color iconColor = Color.white;
         [SerializeField] private GameObject equippedPrefab;
+        [SerializeField, Min(0), InspectorName("판매 가격")] private int salePrice = 20;
 
         public int ItemNumber => itemNumber;
         public string ItemName => itemName;
@@ -38,6 +39,7 @@ namespace ShinA.Inventory
         public Sprite Icon => icon;
         public Color IconColor => iconColor;
         public GameObject EquippedPrefab => equippedPrefab;
+        public int SalePrice => Mathf.Max(0, salePrice);
         public abstract ItemEffectType EffectType { get; }
 
         public virtual bool Use(ItemUseContext context)

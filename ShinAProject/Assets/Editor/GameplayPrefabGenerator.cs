@@ -76,6 +76,12 @@ namespace ShinA.Editor
                 string itemAssetPath = $"{ItemDataFolder}/Item_{number}.asset";
                 ItemDefinition definition = AssetDatabase.LoadAssetAtPath<ItemDefinition>(itemAssetPath);
                 Sprite existingIcon = definition != null ? definition.Icon : null;
+                if (definition != null)
+                {
+                    SerializedObject serializedSample = new(sample);
+                    serializedSample.FindProperty("salePrice").intValue = definition.SalePrice;
+                    serializedSample.ApplyModifiedPropertiesWithoutUndo();
+                }
                 if (definition == null || definition.GetType() != sample.GetType())
                 {
                     if (definition != null)

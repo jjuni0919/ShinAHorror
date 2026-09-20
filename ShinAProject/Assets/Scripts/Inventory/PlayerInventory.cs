@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ShinA.Player;
+using ShinA.Settings;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -73,6 +74,34 @@ namespace ShinA.Inventory
             return removedItems;
         }
 
+        public ItemDefinition TakeSelected()
+        {
+            ItemDefinition item = SelectedItem;
+            if (item == null) return null;
+            items.RemoveAt(selectedIndex);
+            selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, items.Count - 1));
+            EquipSelected();
+            InventoryChanged?.Invoke();
+            return item;
+        }
+
+        public bool DropSelected()
+        {
+            if (SelectedItem == null || viewCamera == null || (controller != null && !controller.CanAct)) return false;
+            Vector3 origin = viewCamera.transform.position;
+            Vector3 direction = viewCamera.transform.forward;
+            if (Physics.SphereCast(origin, 0.25f, direction, out _, 0.85f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                NotifyItemResponse("아이템을 내려놓을 공간이 없습니다.");
+                return false;
+            }
+            ItemPickup pickup = ItemPickup.Spawn(SelectedItem, origin + direction * 0.85f, Quaternion.identity);
+            if (pickup == null) return false;
+            TakeSelected();
+            pickup.GetComponent<Rigidbody>().linearVelocity = direction;
+            return true;
+        }
+
         public void SetCapacity(int slotCount)
         {
             capacity = Mathf.Max(items.Count, Mathf.Max(1, slotCount));
@@ -141,6 +170,12 @@ namespace ShinA.Inventory
             }
 
             HandleSlotSelection();
+
+            if (PlayerInputBindings.WasPressedThisFrame(PlayerAction.DropItem))
+            {
+                DropSelected();
+                return;
+            }
 
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame &&
                 cursorWasLocked && Cursor.lockState == CursorLockMode.Locked)

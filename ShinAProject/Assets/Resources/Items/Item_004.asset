@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Item_004
   m_EditorClassIdentifier: Assembly-CSharp::ShinA.Inventory.NoEffectItemDefinition
   itemNumber: 4
+  salePrice: 80
   itemName: "\uC624\uB798\uB41C \uB3D9\uC804"
   description: "\uC0AC\uC6A9\uCC98\uB97C \uC54C \uC218 \uC5C6\uB294 \uBB34\uAC70\uC6B4
     \uB3D9\uC804\uC774\uB2E4."

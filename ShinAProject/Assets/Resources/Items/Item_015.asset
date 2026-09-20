@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Item_015
   m_EditorClassIdentifier: Assembly-CSharp::ShinA.Inventory.RangedWeaponDefinition
   itemNumber: 15
+  salePrice: 130
   itemName: "\uC2E0\uD638\uD0C4 \uBC1C\uC0AC\uAE30"
   description: "\uAC15\uD55C \uBE5B\uC744 \uBC1C\uC0AC\uD558\uB294 \uC6D0\uAC70\uB9AC
     \uC7A5\uBE44\uB2E4."

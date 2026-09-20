@@ -5,16 +5,37 @@ namespace ShinA.Inventory
     public sealed class ItemPickup : MonoBehaviour
     {
         [SerializeField] private ItemDefinition item;
-        [SerializeField] private float rotationSpeed = 35f;
-        [SerializeField] private float bobHeight = 0.12f;
-        [SerializeField] private float bobSpeed = 2f;
-
-        private Vector3 startPosition;
-        private float bobOffset;
         private bool collected;
         private Material generatedMaterial;
 
         public ItemDefinition Item => item;
+        public bool IsCollected => collected;
+
+        public static ItemPickup Spawn(ItemDefinition definition, Vector3 position, Quaternion rotation)
+        {
+            if (definition == null) return null;
+            ItemPickup prefab = Resources.Load<ItemPickup>($"Prefabs/Items/ItemPickup_{definition.ItemNumber:000}");
+            if (prefab == null)
+            {
+                Debug.LogError($"아이템 프리팹이 없습니다: {definition.ItemNumber}");
+                return null;
+            }
+            return Instantiate(prefab, position, rotation);
+        }
+
+        private void Awake()
+        {
+            SphereCollider collider = GetComponent<SphereCollider>();
+            if (collider == null) collider = gameObject.AddComponent<SphereCollider>();
+            collider.isTrigger = false;
+            collider.radius = 0.22f;
+            Rigidbody body = GetComponent<Rigidbody>();
+            if (body == null) body = gameObject.AddComponent<Rigidbody>();
+            body.useGravity = true;
+            body.isKinematic = false;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            body.interpolation = RigidbodyInterpolation.Interpolate;
+        }
 
         public void SetDefinition(ItemDefinition definition)
         {
@@ -48,22 +69,9 @@ namespace ShinA.Inventory
             }
 
             inventory.NotifyItemResponse($"{item.ItemName}을(를) 획득했습니다.");
+            gameObject.SetActive(false);
             Destroy(gameObject);
             return true;
-        }
-
-        private void Start()
-        {
-            startPosition = transform.position;
-            bobOffset = Random.Range(0f, Mathf.PI * 2f);
-        }
-
-        private void Update()
-        {
-            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
-            Vector3 position = startPosition;
-            position.y += Mathf.Sin(Time.time * bobSpeed + bobOffset) * bobHeight;
-            transform.position = position;
         }
 
         private void BuildVisual()
@@ -74,8 +82,8 @@ namespace ShinA.Inventory
                 pickupCollider = gameObject.AddComponent<SphereCollider>();
             }
 
-            pickupCollider.radius = 0.55f;
-            pickupCollider.isTrigger = true;
+            pickupCollider.radius = 0.22f;
+            pickupCollider.isTrigger = false;
 
             Transform existingVisual = transform.Find("Visual");
             if (existingVisual != null)

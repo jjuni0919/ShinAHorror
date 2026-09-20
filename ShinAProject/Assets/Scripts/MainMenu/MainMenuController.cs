@@ -48,6 +48,11 @@ namespace ShinA.UI
 
         public void StartGame()
         {
+            if (ShinA.SaveSystem.SaveManager.Instance.HasSaveData)
+            {
+                if (!ShinA.SaveSystem.SaveManager.Instance.LoadGame()) ShowStatus("저장한 게임을 불러오지 못했습니다.");
+                return;
+            }
             if (Application.CanStreamedLevelBeLoaded(gameSceneName))
             {
                 SceneLoader.Instance.LoadScene(gameSceneName);

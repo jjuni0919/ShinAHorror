@@ -65,6 +65,7 @@ namespace ShinA.Maps
             }
 
             System.Random random = new(unchecked(initializer.GenerationSeed * 397 ^ seedOffset));
+            if (ShinA.SaveSystem.WorldItemPersistence.HasSnapshot(gameObject.scene.name, initializer.GenerationSeed)) return;
             System.Random positionRandom = new(unchecked(initializer.GenerationSeed * 7919 ^ seedOffset));
             Physics.SyncTransforms();
             SpawnItems(random, positionRandom);

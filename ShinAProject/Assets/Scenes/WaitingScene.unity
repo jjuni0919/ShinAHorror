@@ -325,9 +325,79 @@ MonoBehaviour:
   initialPlayerSkin: {fileID: 0}
   inventorySlotCount: 6
   cameraForwardOffset: 0.18
+--- !u!1 &1900000100
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1900000101}
+  - component: {fileID: 1900000102}
+  m_Layer: 0
+  m_Name: WorldItemPersistence
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &1900000101
+Transform:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1900000100}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+--- !u!114 &1900000102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1900000100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afd817c8bc384116ada1000000000007, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ShinA.SaveSystem.WorldItemPersistence
+--- !u!1 &1900000200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1900000201}
+  - component: {fileID: 1900000202}
+  m_Layer: 0
+  m_Name: CollectionBox
+  m_TagString: Untagged
+  m_IsActive: 1
+--- !u!4 &1900000201
+Transform:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1900000200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.5, y: 0.15, z: -5.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+--- !u!114 &1900000202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1900000200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b857fd7a754a4e659da739289a765c42, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ShinA.Economy.CollectionBox
+  revenueQuota: 500
+  rewardPerExpedition: 100
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1925675534}
   - {fileID: 120066520}
+  - {fileID: 1900000101}
+  - {fileID: 1900000201}

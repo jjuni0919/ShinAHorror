@@ -17,7 +17,8 @@ namespace ShinA.Settings
         Crouch,
         Interact,
         Tablet,
-        WorldInteract
+        WorldInteract,
+        DropItem
     }
 
     public static class PlayerInputBindings
@@ -118,6 +119,7 @@ namespace ShinA.Settings
                 PlayerAction.Interact => Key.E,
                 PlayerAction.WorldInteract => Key.F,
                 PlayerAction.Tablet => Key.Tab,
+                PlayerAction.DropItem => Key.Q,
                 _ => Key.None
             };
         }

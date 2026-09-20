@@ -59,6 +59,7 @@ namespace ShinA.Missions
         public string ActiveMapName => activeMapName;
         public float RemainingTime => Mathf.Max(0f, remainingTime);
         public int FieldStorageCount => fieldStorageItemNumbers.Count;
+        public IReadOnlyList<int> FieldStorageItemNumbers => fieldStorageItemNumbers;
         public int PendingCurrency => pendingCurrency;
         public MissionOutcome LastOutcome { get; private set; }
 
@@ -108,7 +109,7 @@ namespace ShinA.Missions
 
         public bool Prepare(MapRecord map, int seed)
         {
-            if (map == null || map.missionDurationSeconds <= 0f || IsActive)
+            if (map == null || map.missionDurationSeconds <= 0f || IsActive || Progress.IsCompanyDay || Progress.IsGameOver)
             {
                 return false;
             }
@@ -123,6 +124,13 @@ namespace ShinA.Missions
             running = false;
             ending = false;
             LastOutcome = MissionOutcome.None;
+            SaveData data = SaveManager.Instance.CurrentData;
+            if (data != null && data.activeMissionMapId == map.mapId && data.activeMissionSeed == seed)
+            {
+                remainingTime = Mathf.Max(0f, data.missionRemainingTime);
+                pendingCurrency = data.missionCurrency;
+                fieldStorageItemNumbers.AddRange(data.fieldStorageItems);
+            }
             return true;
         }
 
@@ -219,6 +227,18 @@ namespace ShinA.Missions
             LastOutcome = ParseOutcome(data.lastMissionResult);
         }
 
+        internal void WriteTo(SaveData data)
+        {
+            Progress.WriteTo(data);
+            data.playTimeSeconds = accumulatedPlayTime;
+            data.activeMissionMapId = activeMapId;
+            data.activeMissionSeed = activeSeed;
+            data.missionRemainingTime = remainingTime;
+            data.missionCurrency = pendingCurrency;
+            data.fieldStorageItems.Clear();
+            data.fieldStorageItems.AddRange(fieldStorageItemNumbers);
+        }
+
         private void OnPlayerDied()
         {
             EndMission(MissionOutcome.PlayerDied);
@@ -246,25 +266,22 @@ namespace ShinA.Missions
             else
             {
                 Progress.FailDay(failureCurrencyPenalty);
+                FindFirstObjectByType<PlayerInventory>()?.TakeAllItems();
             }
 
             LastOutcome = outcome;
             SaveData data = SaveManager.Instance.CurrentData ?? SaveManager.Instance.CreateNewData();
             data.currentScene = WaitingSceneName;
             data.playTimeSeconds = accumulatedPlayTime;
-            data.inventoryItemNumbers.Clear();
             data.lastMissionMapId = activeMapId;
             data.lastMissionResult = outcome.ToString();
             data.lastMissionSeed = activeSeed;
             data.player.position = Vector3.zero;
             data.player.eulerAngles = Vector3.zero;
-            Progress.WriteTo(data);
-
-            if (!SaveManager.Instance.Save(data))
-            {
-                Debug.LogError("임무가 종료되었지만 저장 데이터를 기록하지 못했습니다.", this);
-            }
-
+            if (data.pendingOrders.Count > 0) data.deliveryBoxOpened = false;
+            data.deliveredOrders.AddRange(data.pendingOrders);
+            data.pendingOrders.Clear();
+            data.selectedMapId = null;
             ClearMission();
             if (!SceneLoader.Instance.LoadScene(WaitingSceneName))
             {

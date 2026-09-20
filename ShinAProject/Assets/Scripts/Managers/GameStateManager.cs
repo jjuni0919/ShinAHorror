@@ -11,7 +11,8 @@ namespace ShinA.Managers
     {
         Playing,
         Paused,
-        Loading
+        Loading,
+        GameOver
     }
 
     [DefaultExecutionOrder(-200)]
@@ -20,6 +21,9 @@ namespace ShinA.Managers
         private static GameStateManager instance;
         private FirstPersonController playerController;
         private GameObject pauseScreen;
+        private Text stateTitle;
+        private Text stateInstruction;
+        private GameObject restartButton;
         private EventSystem pausedEventSystem;
         private bool previousNavigationEvents;
 
@@ -67,7 +71,7 @@ namespace ShinA.Managers
         private void Update()
         {
             if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame ||
-                CurrentState == GameState.Loading)
+                CurrentState == GameState.Loading || CurrentState == GameState.GameOver)
             {
                 return;
             }
@@ -95,7 +99,13 @@ namespace ShinA.Managers
 
         private void ApplyState()
         {
-            bool paused = CurrentState == GameState.Paused;
+            bool gameOver = CurrentState == GameState.GameOver;
+            bool paused = CurrentState == GameState.Paused || gameOver;
+            if (stateTitle != null) stateTitle.text = gameOver ? "게임 종료 · 수익 할당량 미달" : "일시정지";
+            if (stateInstruction != null) stateInstruction.text = gameOver
+                ? $"정산 수익 {ShinA.Missions.MissionSession.Instance.Progress.LastSettlementRevenue:N0}\n새 게임을 시작하면 기존 진행 상황이 초기화됩니다."
+                : "ESC 키를 눌러 계속하기";
+            restartButton?.SetActive(gameOver);
             Time.timeScale = paused ? 0f : 1f;
             pauseScreen?.SetActive(paused);
 
@@ -163,8 +173,21 @@ namespace ShinA.Managers
             Text title = CreateText(canvasObject.transform, font, "일시정지", 52,
                 new Vector2(0.25f, 0.5f), new Vector2(0.75f, 0.65f));
             title.fontStyle = FontStyle.Bold;
-            CreateText(canvasObject.transform, font, "ESC 키를 눌러 계속하기", 24,
+            stateTitle = title;
+            stateInstruction = CreateText(canvasObject.transform, font, "ESC 키를 눌러 계속하기", 24,
                 new Vector2(0.25f, 0.38f), new Vector2(0.75f, 0.5f));
+            Text restartText = CreateText(canvasObject.transform, font, "새 게임", 28,
+                new Vector2(0.4f, 0.25f), new Vector2(0.6f, 0.34f));
+            restartText.raycastTarget = true;
+            Button button = restartText.gameObject.AddComponent<Button>();
+            button.targetGraphic = restartText;
+            button.onClick.AddListener(() =>
+            {
+                if (!ShinA.SaveSystem.SaveManager.Instance.StartNewGame())
+                    stateInstruction.text = "새 게임을 저장하거나 불러오지 못했습니다. 다시 시도해 주세요.";
+            });
+            restartButton = restartText.gameObject;
+            restartButton.SetActive(false);
 
             pauseScreen = canvasObject;
             pauseScreen.SetActive(false);
