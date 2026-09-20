@@ -10,34 +10,34 @@ namespace ShinA.Player
     {
         private const float GroundedVerticalVelocity = -2f;
 
-        [Header("References")]
+        [Header("참조")]
         [SerializeField] private Camera playerCamera;
 
-        [Header("Movement")]
+        [Header("이동")]
         [SerializeField, Min(0f)] private float walkSpeed = 4f;
         [SerializeField, Min(0f)] private float runSpeed = 7f;
         [SerializeField, Min(0f)] private float crouchSpeed = 2.2f;
         [SerializeField, Min(0f)] private float jumpHeight = 1.2f;
         [SerializeField] private float gravity = -24f;
 
-        [Header("Crouch")]
+        [Header("앉기")]
         [SerializeField, Min(0.5f)] private float standingHeight = 1.8f;
         [SerializeField, Min(0.5f)] private float crouchingHeight = 1.1f;
         [SerializeField, Min(0f)] private float standingCameraHeight = 1.65f;
         [SerializeField, Min(0f)] private float crouchingCameraHeight = 1f;
         [SerializeField, Min(0.1f)] private float crouchTransitionSpeed = 10f;
 
-        [Header("Look")]
+        [Header("시점")]
         [SerializeField, Range(1f, 89f)] private float maxLookAngle = 85f;
 
-        [Header("Stamina")]
+        [Header("스태미나")]
         [SerializeField, Min(0.1f)] private float maxStamina = 5f;
         [SerializeField, Min(0f)] private float staminaDrainPerSecond = 1f;
         [SerializeField, Min(0f)] private float staminaRecoveryPerSecond = 0.8f;
         [SerializeField, Min(0f)] private float jumpStaminaCost = 1f;
         [SerializeField, Range(0f, 1f)] private float exhaustionRecoveryThreshold = 0.4f;
 
-        [Header("Low Health")]
+        [Header("낮은 체력")]
         [SerializeField, Range(0f, 1f)] private float lowHealthThreshold = 0.2f;
         [SerializeField, Range(0f, 1f)] private float lowHealthSpeedMultiplier = 0.5f;
 

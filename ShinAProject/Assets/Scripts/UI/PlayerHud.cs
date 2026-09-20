@@ -303,7 +303,7 @@ namespace ShinA.UI
             groupRect.anchoredPosition = new Vector2(64f, -70f);
             groupRect.sizeDelta = new Vector2(320f, 42f);
 
-            Text label = CreateText("Label", group.transform, "HP", 18, TextAnchor.MiddleLeft,
+            Text label = CreateText("Label", group.transform, "체력", 18, TextAnchor.MiddleLeft,
                 new Color(0.92f, 0.92f, 0.9f), FontStyle.Bold);
             label.rectTransform.anchorMin = Vector2.zero;
             label.rectTransform.anchorMax = new Vector2(0f, 1f);

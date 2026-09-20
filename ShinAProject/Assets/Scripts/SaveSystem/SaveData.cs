@@ -64,7 +64,7 @@ namespace ShinA.SaveSystem
         public static implicit operator Vector3(SerializableVector3 value) => value.ToVector3();
     }
 
-    // JsonUtility cannot serialize Dictionary directly, so extensible values use parallel lists.
+    // JsonUtility는 Dictionary를 직렬화할 수 없으므로 확장 데이터의 키와 값을 병렬 목록으로 저장한다.
     [Serializable]
     public sealed class DictionaryData
     {

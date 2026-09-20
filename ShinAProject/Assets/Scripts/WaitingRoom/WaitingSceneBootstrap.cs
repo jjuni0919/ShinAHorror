@@ -24,7 +24,7 @@ namespace ShinA.WaitingRoom
             PlayerRuntimeSetup setup = player.GetComponent<PlayerRuntimeSetup>();
             if (setup == null)
             {
-                Debug.LogError("Player prefab is missing PlayerRuntimeSetup.", player);
+                Debug.LogError("플레이어 프리팹에 PlayerRuntimeSetup 컴포넌트가 없습니다.", player);
                 return;
             }
 

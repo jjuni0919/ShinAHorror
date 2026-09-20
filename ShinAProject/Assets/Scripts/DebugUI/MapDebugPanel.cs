@@ -45,7 +45,7 @@ namespace ShinA.DebugUI
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
-            Text title = CreateText(contentRoot, $"MAP DEBUG  //  SHIFT + CTRL + {ToggleKey}", 26,
+            Text title = CreateText(contentRoot, $"맵 디버그  //  SHIFT + CTRL + {ToggleKey}", 26,
                 FontStyle.Bold);
             title.gameObject.AddComponent<LayoutElement>().preferredHeight = 58f;
 
@@ -101,7 +101,7 @@ namespace ShinA.DebugUI
                 return;
             }
 
-            Debug.LogWarning($"Failed to load map '{mapId}'.", this);
+            Debug.LogWarning($"맵을 불러오지 못했습니다: '{mapId}'", this);
         }
 
         private Button CreateButton(Transform parent, string label)

@@ -54,7 +54,7 @@ namespace ShinA.Maps
             GameObject playerPrefab = Resources.Load<GameObject>("Prefabs/Player/Player");
             if (playerPrefab == null)
             {
-                Debug.LogError("Player prefab could not be loaded.", this);
+                Debug.LogError("플레이어 프리팹을 불러오지 못했습니다.", this);
                 return null;
             }
 

@@ -90,7 +90,7 @@ namespace ShinA.SaveSystem
                                                exception is NotSupportedException ||
                                                exception is ArgumentException)
             {
-                Debug.LogException(exception, this);
+                Debug.LogError($"게임 저장 중 오류가 발생했습니다.\n{exception}", this);
                 return false;
             }
 
@@ -113,7 +113,7 @@ namespace ShinA.SaveSystem
                 data = JsonUtility.FromJson<SaveData>(json);
                 if (data == null || !TryMigrate(data))
                 {
-                    Debug.LogError("Save data is invalid or uses an unsupported schema version.", this);
+                    Debug.LogError("저장 데이터가 유효하지 않거나 지원하지 않는 스키마 버전을 사용합니다.", this);
                     data = null;
                     return false;
                 }
@@ -131,7 +131,7 @@ namespace ShinA.SaveSystem
                                                exception is NotSupportedException ||
                                                exception is ArgumentException)
             {
-                Debug.LogException(exception, this);
+                Debug.LogError($"저장 데이터 불러오기 중 오류가 발생했습니다.\n{exception}", this);
                 data = null;
                 return false;
             }

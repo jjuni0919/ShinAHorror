@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ShinA.Inventory
 {
-    [CreateAssetMenu(fileName = "RangedWeapon", menuName = "ShinA/Items/Ranged Weapon")]
+    [CreateAssetMenu(fileName = "RangedWeapon", menuName = "ShinA/아이템/원거리 무기")]
     public sealed class RangedWeaponDefinition : WeaponItemDefinition
     {
         [SerializeField, Min(0.1f)] private float attackRange = 40f;

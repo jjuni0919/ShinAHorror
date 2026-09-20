@@ -2069,7 +2069,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: SHIN A  /  PROTOTYPE BUILD
+  m_Text: "SHIN A  /  \uD504\uB85C\uD1A0\uD0C0\uC785 \uBE4C\uB4DC"
 --- !u!222 &1321144675
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3094,7 +3094,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: MAIN MENU
+  m_Text: "\uBA54\uC778 \uBA54\uB274"
 --- !u!222 &2033066581
 CanvasRenderer:
   m_ObjectHideFlags: 0

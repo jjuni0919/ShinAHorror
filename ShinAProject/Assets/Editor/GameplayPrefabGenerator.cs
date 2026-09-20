@@ -14,7 +14,7 @@ namespace ShinA.Editor
         private const string ItemPickupFolder = "Assets/Resources/Prefabs/Items";
         private const string ItemMaterialFolder = "Assets/Resources/Materials/Items";
 
-        [MenuItem("ShinA/Generate Gameplay Prefabs")]
+        [MenuItem("ShinA/게임플레이 프리팹 생성")]
         public static void Generate()
         {
             CreateDirectories();
@@ -22,7 +22,7 @@ namespace ShinA.Editor
             CreateItemAssetsAndPrefabs();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Player prefab and 15 item prefabs generated.");
+            Debug.Log("플레이어 프리팹과 아이템 프리팹 15개를 생성했습니다.");
         }
 
         private static void CreateDirectories()

@@ -135,7 +135,7 @@ namespace ShinA.Player
             int localBodyLayer = LayerMask.NameToLayer(LocalBodyLayerName);
             if (localBodyLayer < 0)
             {
-                Debug.LogWarning($"Player layer '{LocalBodyLayerName}' is missing.", this);
+                Debug.LogWarning($"플레이어 레이어가 없습니다: '{LocalBodyLayerName}'", this);
                 return;
             }
 

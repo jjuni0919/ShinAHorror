@@ -17,7 +17,7 @@ namespace ShinA.Editor
         private const string ScenePath = "Assets/Scenes/MainMenu.unity";
         private const string WaitingScenePath = "Assets/Scenes/WaitingScene.unity";
 
-        [MenuItem("ShinA/Generate Main Menu Scene")]
+        [MenuItem("ShinA/메인 메뉴 씬 생성")]
         public static void Generate()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -47,7 +47,7 @@ namespace ShinA.Editor
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath) ?? "Assets/Scenes");
             if (!EditorSceneManager.SaveScene(scene, ScenePath))
             {
-                Debug.LogError($"Failed to save main menu scene: {ScenePath}");
+                Debug.LogError($"메인 메뉴 씬을 저장하지 못했습니다: {ScenePath}");
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace ShinA.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"Main menu scene generated: {ScenePath}");
+            Debug.Log($"메인 메뉴 씬을 생성했습니다: {ScenePath}");
         }
 
         private static void CreateCamera()
@@ -140,7 +140,7 @@ namespace ShinA.Editor
             menuRect.anchoredPosition = new Vector2(144f, 0f);
             menuRect.sizeDelta = new Vector2(500f, 650f);
 
-            Text eyebrow = CreateText("Eyebrow", menuRect, "MAIN MENU", 18, TextAnchor.MiddleLeft,
+            Text eyebrow = CreateText("Eyebrow", menuRect, "메인 메뉴", 18, TextAnchor.MiddleLeft,
                 new Color(0.62f, 0.08f, 0.08f, 1f), FontStyle.Bold);
             SetAnchored(eyebrow.rectTransform, 0f, 590f, 500f, 28f);
 
@@ -257,7 +257,7 @@ namespace ShinA.Editor
 
         private static void CreateFooter(Transform parent)
         {
-            Text footer = CreateText("Footer", parent, "SHIN A  /  PROTOTYPE BUILD", 13, TextAnchor.MiddleRight,
+            Text footer = CreateText("Footer", parent, "SHIN A  /  프로토타입 빌드", 13, TextAnchor.MiddleRight,
                 new Color(0.28f, 0.29f, 0.3f, 1f), FontStyle.Normal);
             footer.rectTransform.anchorMin = new Vector2(1f, 0f);
             footer.rectTransform.anchorMax = new Vector2(1f, 0f);

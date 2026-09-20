@@ -47,7 +47,7 @@ namespace ShinA.Player
             if (playerCamera == null || controller == null || appearance == null || health == null ||
                 inventory == null || interactor == null || tablet == null)
             {
-                Debug.LogError("Player prefab is missing one or more required components.", this);
+                Debug.LogError("플레이어 프리팹에 필수 컴포넌트가 하나 이상 없습니다.", this);
                 return;
             }
 

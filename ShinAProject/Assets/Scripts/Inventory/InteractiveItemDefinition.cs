@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace ShinA.Inventory
 {
-    [CreateAssetMenu(fileName = "InteractiveItem", menuName = "ShinA/Items/Interactive Item")]
+    [CreateAssetMenu(fileName = "InteractiveItem", menuName = "ShinA/아이템/상호작용 아이템")]
     public sealed class InteractiveItemDefinition : ItemDefinition
     {
-        [SerializeField, TextArea] private string responseMessage = "The item reacts.";
+        [SerializeField, TextArea] private string responseMessage = "아이템이 반응한다.";
 
         public override ItemEffectType EffectType => ItemEffectType.Interactive;
 

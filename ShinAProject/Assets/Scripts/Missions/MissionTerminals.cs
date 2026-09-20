@@ -138,7 +138,7 @@ namespace ShinA.Missions
 
             if (EventSystem.current == null)
             {
-                Debug.LogError("Mission confirmation requires an EventSystem.", this);
+                Debug.LogError("임무 확인 창을 사용하려면 EventSystem이 필요합니다.", this);
             }
         }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ShinA.Player
 {
-    [CreateAssetMenu(fileName = "PlayerSkin", menuName = "ShinA/Player Skin")]
+    [CreateAssetMenu(fileName = "PlayerSkin", menuName = "ShinA/플레이어 스킨")]
     public sealed class PlayerSkinDefinition : ScriptableObject
     {
         [SerializeField] private string skinId = "default";

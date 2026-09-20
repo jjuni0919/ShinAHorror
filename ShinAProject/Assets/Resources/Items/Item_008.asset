@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e47a53ae66074f08a6a28de8851f71b4, type: 3}
-  m_Name: "Item_008_\uAD6C\uAE09 \uC0C1\uC790"
+  m_Name: Item_008
   m_EditorClassIdentifier: Assembly-CSharp::ShinA.Inventory.InteractiveItemDefinition
   itemNumber: 8
   itemName: "\uAD6C\uAE09 \uC0C1\uC790"

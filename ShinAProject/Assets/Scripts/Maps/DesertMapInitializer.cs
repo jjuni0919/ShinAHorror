@@ -44,7 +44,7 @@ namespace ShinA.Maps
                 dune.GetComponent<Renderer>().sharedMaterial = sand;
             }
 
-            // Keep the spawn clearing and the approach to the landmark free of generated obstacles.
+            // 생성 장애물이 시작 지점과 랜드마크 진입로를 막지 않도록 이 구역을 비워 둔다.
             Vector3 landmark = new(0f, 0f, 13f);
             for (int i = 0; i < pillarCount; i++)
             {

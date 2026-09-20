@@ -257,14 +257,14 @@ namespace ShinA.Missions
 
             if (!SaveManager.Instance.Save(data))
             {
-                Debug.LogError("Mission ended, but save data could not be written.", this);
+                Debug.LogError("임무가 종료되었지만 저장 데이터를 기록하지 못했습니다.", this);
             }
 
             ClearMission();
             if (!SceneLoader.Instance.LoadScene(WaitingSceneName))
             {
                 ending = false;
-                Debug.LogError("Mission ended, but the waiting scene could not be loaded.", this);
+                Debug.LogError("임무가 종료되었지만 대기실 씬을 불러오지 못했습니다.", this);
             }
         }
 

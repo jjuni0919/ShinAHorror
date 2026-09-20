@@ -33,7 +33,7 @@ sealed class ReadmeEditor : Editor
         var ids = AssetDatabase.FindAssets("Readme t:Readme");
         if (ids.Length != 1)
         {
-            Debug.Log("Couldn't find a readme");
+            Debug.Log("프로젝트 안내 파일을 찾지 못했습니다.");
             return null;
         }
 
@@ -44,11 +44,11 @@ sealed class ReadmeEditor : Editor
     
     void RemoveTutorial()
     {
-        if (EditorUtility.DisplayDialog("Remove Readme Assets",
+        if (EditorUtility.DisplayDialog("프로젝트 안내 에셋 제거",
             
-            $"All contents under {k_ReadmeSourceDirectory} will be removed, are you sure you want to proceed?",
-            "Proceed",
-            "Cancel"))
+            $"{k_ReadmeSourceDirectory} 아래의 모든 내용을 제거합니다. 계속하시겠습니까?",
+            "계속",
+            "취소"))
         {
             if (Directory.Exists(k_ReadmeSourceDirectory))
             {
@@ -57,7 +57,7 @@ sealed class ReadmeEditor : Editor
             }
             else
             {
-                Debug.Log($"Could not find the Readme folder at {k_ReadmeSourceDirectory}");
+                Debug.Log($"프로젝트 안내 폴더를 찾지 못했습니다: {k_ReadmeSourceDirectory}");
             }
 
             var readmeAsset = SelectReadme();
@@ -72,7 +72,7 @@ sealed class ReadmeEditor : Editor
         }
     }
 
-    //Remove ImGUI
+    // 기본 IMGUI 인스펙터를 숨기고 UI Toolkit 화면만 표시한다.
     protected sealed override void OnHeaderGUI() { }
     public sealed override void OnInspectorGUI() { }
 
@@ -90,14 +90,13 @@ sealed class ReadmeEditor : Editor
             return created;
         }
 
-        //Header
+        // 제목과 본문은 서로 다른 스타일을 적용하기 위해 별도 컨테이너로 구성한다.
         VisualElement title = new();
         title.AddToClassList("title");
         title.Add(ChainWithClass(new Image() { image = readme.icon }, "title__icon"));
         title.Add(ChainWithClass(new Label(readme.title), "title__text"));
         root.Add(title);
 
-        //Content
         foreach (var section in readme.sections)
         {
             VisualElement part = new();
@@ -119,7 +118,7 @@ sealed class ReadmeEditor : Editor
             root.Add(part);
         }
 
-        var button = new Button(RemoveTutorial) { text = "Remove Readme Assets" };
+        var button = new Button(RemoveTutorial) { text = "프로젝트 안내 에셋 제거" };
         button.AddToClassList("remove-readme-button");
         root.Add(button);
 

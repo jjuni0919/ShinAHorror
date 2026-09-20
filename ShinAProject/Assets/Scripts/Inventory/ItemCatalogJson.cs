@@ -65,7 +65,7 @@ namespace ShinA.Inventory
                 if (record == null || record.itemNumber <= 0 || string.IsNullOrWhiteSpace(record.itemName) ||
                     !itemNumbers.Add(record.itemNumber))
                 {
-                    Debug.LogError("Item catalog contains a null, duplicate, or incomplete item record.");
+                    Debug.LogError("아이템 카탈로그에 null, 중복 또는 불완전한 레코드가 있습니다.");
                     continue;
                 }
 
@@ -104,7 +104,7 @@ namespace ShinA.Inventory
             }
             else if (record.effectType == ItemEffectType.Weapon)
             {
-                Debug.LogError($"Item {record.itemNumber} has no valid weapon attack type.");
+                Debug.LogError($"아이템 {record.itemNumber}에 유효한 무기 공격 유형이 없습니다.");
                 return null;
             }
             else

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ShinA.Inventory
 {
-    [CreateAssetMenu(fileName = "MeleeWeapon", menuName = "ShinA/Items/Melee Weapon")]
+    [CreateAssetMenu(fileName = "MeleeWeapon", menuName = "ShinA/아이템/근접 무기")]
     public sealed class MeleeWeaponDefinition : WeaponItemDefinition
     {
         [SerializeField, Min(0.1f)] private float attackRange = 2f;

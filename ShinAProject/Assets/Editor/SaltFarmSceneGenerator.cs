@@ -11,7 +11,7 @@ namespace ShinA.Editor
     {
         private const string ScenePath = "Assets/Scenes/SaltFarmScene.unity";
 
-        [MenuItem("ShinA/Generate Salt Farm Scene")]
+        [MenuItem("ShinA/염전 씬 생성")]
         public static void Generate()
         {
             Scene previousScene = SceneManager.GetActiveScene();
@@ -30,14 +30,14 @@ namespace ShinA.Editor
 
             if (!saved)
             {
-                Debug.LogError($"Failed to save salt farm scene: {ScenePath}");
+                Debug.LogError($"염전 씬을 저장하지 못했습니다: {ScenePath}");
                 return;
             }
 
             RegisterBuildScene();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Salt farm map scene generated and registered.");
+            Debug.Log("염전 맵 씬을 생성하고 빌드 목록에 등록했습니다.");
         }
 
         private static void RegisterBuildScene()

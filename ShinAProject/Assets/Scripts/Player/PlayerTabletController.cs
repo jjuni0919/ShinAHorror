@@ -117,7 +117,7 @@ namespace ShinA.Player
                 font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             }
 
-            Text title = CreateText(canvasObject.transform, font, "SHIN A // FIELD TABLET", 25,
+            Text title = CreateText(canvasObject.transform, font, "SHIN A // 현장 태블릿", 25,
                 new Vector2(0.05f, 0.82f), new Vector2(0.95f, 0.96f), TextAnchor.MiddleLeft);
             title.color = new Color(0.55f, 0.92f, 0.88f);
             missionText = CreateText(canvasObject.transform, font, string.Empty, 29,
@@ -141,7 +141,7 @@ namespace ShinA.Player
             if (session.IsActive)
             {
                 int seconds = Mathf.CeilToInt(session.RemainingTime);
-                missionText.text = $"DAY {progress.Day}  ·  {session.ActiveMapName}";
+                missionText.text = $"{progress.Day}일차  ·  {session.ActiveMapName}";
                 timerText.text = $"{seconds / 60:00}:{seconds % 60:00}";
                 timerText.color = seconds <= 60
                     ? new Color(1f, 0.28f, 0.2f)
@@ -152,7 +152,7 @@ namespace ShinA.Player
                 return;
             }
 
-            missionText.text = $"DAY {progress.Day}  ·  본부 대기 중";
+            missionText.text = $"{progress.Day}일차  ·  본부 대기 중";
             timerText.text = "--:--";
             timerText.color = new Color(0.55f, 0.92f, 0.88f);
             progressText.text = $"대기실 창고  {progress.WarehouseItemNumbers.Count}개\n보유 재화  {progress.Currency:N0}";
