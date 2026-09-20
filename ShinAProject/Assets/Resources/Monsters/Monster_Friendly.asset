@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 423876593f4b2b8498964e0115ec7b3c, type: 3}
+  m_Name: Monster_Friendly
+  m_EditorClassIdentifier: Assembly-CSharp::ShinA.Monsters.MonsterDefinition
+  monsterId: Friendly
+  displayName: "\uC6B0\uD638\uC801 \uAC1C\uCCB4"
+  disposition: 1
+  prefab: {fileID: 2330839632279452276, guid: 425430edd251ed14295fa6085c0bcc0e, type: 3}
+  maxHealth: 80
+  attackPower: 0
+  defense: 1
+  moveSpeed: 1.5
+  detectionRange: 0
+  attackRange: 1.5
+  attackCooldown: 1
+  maxSpawnCount: 2
+  spawnChancePerTick: 0.15
+  replenishAfterDeath: 1
+  drops: []

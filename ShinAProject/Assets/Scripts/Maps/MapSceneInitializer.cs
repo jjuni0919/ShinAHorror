@@ -1,4 +1,5 @@
 using ShinA.Missions;
+using ShinA.Monsters;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,6 +25,7 @@ namespace ShinA.Maps
             }
 
             InitializeEnvironment();
+            SpawnDefaultMonsterSpawner(currentMap);
             GameObject player = SpawnPlayer();
             if (player != null)
             {
@@ -39,6 +41,24 @@ namespace ShinA.Maps
 
         protected virtual void ConfigurePlayer(GameObject player)
         {
+        }
+
+        private static void SpawnDefaultMonsterSpawner(MapRecord currentMap)
+        {
+            if (currentMap == null || currentMap.missionDurationSeconds <= 0f ||
+                FindFirstObjectByType<MonsterSpawner>() != null)
+            {
+                return;
+            }
+
+            GameObject spawnerPrefab = Resources.Load<GameObject>("Prefabs/Monsters/MonsterSpawner");
+            if (spawnerPrefab == null)
+            {
+                Debug.LogError("기본 몬스터 스포너 프리팹을 불러오지 못했습니다.");
+                return;
+            }
+
+            Instantiate(spawnerPrefab, Vector3.zero, Quaternion.identity);
         }
 
         protected GameObject SpawnPlayer()

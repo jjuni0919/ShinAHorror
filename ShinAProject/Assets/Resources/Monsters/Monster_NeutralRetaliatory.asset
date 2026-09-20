@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 423876593f4b2b8498964e0115ec7b3c, type: 3}
+  m_Name: Monster_NeutralRetaliatory
+  m_EditorClassIdentifier: Assembly-CSharp::ShinA.Monsters.MonsterDefinition
+  monsterId: NeutralRetaliatory
+  displayName: "\uBC18\uACA9\uD558\uB294 \uC911\uB9BD \uAC1C\uCCB4"
+  disposition: 2
+  prefab: {fileID: 5775392777786948145, guid: 3d2a76b09034f844886f437fdbef3b13, type: 3}
+  maxHealth: 120
+  attackPower: 18
+  defense: 4
+  moveSpeed: 2.8
+  detectionRange: 0
+  attackRange: 1.8
+  attackCooldown: 1.3
+  maxSpawnCount: 3
+  spawnChancePerTick: 0.25
+  replenishAfterDeath: 1
+  drops: []

@@ -25,8 +25,10 @@ namespace ShinA.Inventory
                 CreateMelee(12, "소방 도끼", "무겁고 강력한 근접 무기다.", 42f, 0.85f, new Color(0.62f, 0.12f, 0.1f)),
                 CreateMelee(13, "망치", "짧은 거리에서 사용할 수 있는 무기다.", 30f, 0.65f, new Color(0.28f, 0.31f, 0.34f)),
 
-                CreateRanged(14, "권총", "빠르게 사격할 수 있는 원거리 무기다.", 28f, 0.3f, 45f, new Color(0.18f, 0.2f, 0.22f)),
-                CreateRanged(15, "신호탄 발사기", "강한 빛을 발사하는 원거리 장비다.", 18f, 0.8f, 30f, new Color(0.78f, 0.3f, 0.1f))
+                CreateRanged(14, "권총", "빠르게 사격할 수 있는 원거리 무기다.", 28f, 0.3f, 45f, 12, 1.4f,
+                    new Color(0.18f, 0.2f, 0.22f)),
+                CreateRanged(15, "신호탄 발사기", "강한 빛을 발사하는 원거리 장비다.", 18f, 0.8f, 30f, 1, 2.2f,
+                    new Color(0.78f, 0.3f, 0.1f))
             };
 
             return items;
@@ -59,12 +61,13 @@ namespace ShinA.Inventory
         }
 
         private static RangedWeaponDefinition CreateRanged(int number, string name, string description,
-            float damage, float cooldown, float range, Color color)
+            float damage, float cooldown, float range, int magazineSize, float reloadDuration, Color color)
         {
             RangedWeaponDefinition item = ScriptableObject.CreateInstance<RangedWeaponDefinition>();
             item.ConfigureSample(number, name, description, color);
             item.ConfigureWeapon(damage, cooldown);
             item.ConfigureRange(range);
+            item.ConfigureMagazine(magazineSize, reloadDuration);
             return item;
         }
     }

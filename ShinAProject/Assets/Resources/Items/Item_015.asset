@@ -22,3 +22,5 @@ MonoBehaviour:
   damage: 18
   useCooldown: 0.8
   attackRange: 30
+  magazineSize: 1
+  reloadDuration: 2.2

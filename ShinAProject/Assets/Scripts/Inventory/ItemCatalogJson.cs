@@ -31,6 +31,8 @@ namespace ShinA.Inventory
         public float cooldown = 0.5f;
         public float range = 2f;
         public float hitRadius = 0.45f;
+        public int magazineSize = 12;
+        public float reloadDuration = 1.5f;
         public Color iconColor = Color.white;
         public string iconResourcePath;
         public string equippedPrefabResourcePath;
@@ -94,6 +96,7 @@ namespace ShinA.Inventory
                 RangedWeaponDefinition ranged = ScriptableObject.CreateInstance<RangedWeaponDefinition>();
                 ranged.ConfigureWeapon(record.damage, record.cooldown);
                 ranged.ConfigureRange(record.range);
+                ranged.ConfigureMagazine(record.magazineSize, record.reloadDuration);
                 definition = ranged;
             }
             else if (record.effectType == ItemEffectType.Interactive)
